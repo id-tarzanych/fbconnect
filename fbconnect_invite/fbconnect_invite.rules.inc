@@ -8,9 +8,8 @@
  * @{
  */
 
-
 /**
- * Implementation of hook_rules_event_info().
+ * Implements hook_rules_event_info().
  */
 function fbconnect_invite_rules_event_info() {
   return array(
@@ -18,7 +17,10 @@ function fbconnect_invite_rules_event_info() {
       'label' => t('Invitee User has accepted the invite'),
       'module' => 'fbconnect_invite',
       'arguments' => array(
-        'inviter' => array('type' => 'user', 'label' => t('inviter')),
+        'inviter' => array(
+          'type' => 'user',
+          'label' => t('inviter'),
+        ),
       ),
     ),
   );

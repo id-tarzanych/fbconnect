@@ -2,14 +2,19 @@
 // $Id$
 
 /**
- * Implementation of hook_update_6201().
+ * @file
+ * Install, update and uninstall functions for the fbconnect_stream_publish module.
+ */
+
+/**
+ * Implements hook_update_6201().
  *
  * Change content type activation variable
  */
 function fbconnect_stream_publish_update_6201() {
   $ret = array();
 
-  foreach (array_keys(node_get_types('names')) as $type_name) {
+  foreach (array_keys(node_type_get_names()) as $type_name) {
     //Old variable format variable_get('fbconnect_' . $form['#node_type']->type . '_onoff', 0)
     $old_format = 'fbconnect_' . $type_name . '_onoff';
     $new_format = 'fbconnect_stream_publish_onoff_' . $type_name;
@@ -20,15 +25,18 @@ function fbconnect_stream_publish_update_6201() {
       variable_del($old_format);
     }
   }
-  // Delete any old existing variable
-  db_query("DELETE FROM {variable} WHERE name LIKE 'fbconnect\_%\_onoff'");
+  db_delete('variable')
+    ->condition('name', 'fbconnect\_%\_onoff', 'LIKE')
+    ->execute();
 
-  return $ret;
+  return t('Convert old variable formats.');
 }
 
 /**
- * Implement hook_uninstall().
+ * Implements hook_uninstall().
  */
 function fbconnect_stream_publish_uninstall() {
-  db_query("DELETE FROM {variable} WHERE name LIKE 'fbconnect\_stream\_publish\_onoff\_%'");
+  db_delete('variable')
+    ->condition('name', 'fbconnect\_stream\_publish\_onoff\_%', 'LIKE')
+    ->execute();
 }

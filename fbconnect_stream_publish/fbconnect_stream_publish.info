@@ -1,4 +1,4 @@
 ; $Id$
 name =  Facebook Stream Publish
 package = "Facebook Social"
-core = 6.x
+core = 7.x
