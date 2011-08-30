@@ -12,7 +12,7 @@ function fbconnect_api_keys_settings($form, &$form_state) {
     '#required' => TRUE,
     '#title' => t('Application ID'),
     '#default_value' => variable_get('fbconnect_appid', NULL),
-    '#description' => t('Your Application ID, <strong> not API Key </strong>'),
+    '#description' => t('Also called the <em>OAuth client_id</em> value on Facebook App settings pages. <a href="https://www.facebook.com/developers/createapp.php">Facebook Apps must first be created</a> before they can be added here.'),
   );
 
   $form['fbconnect_skey'] = array(
@@ -20,7 +20,7 @@ function fbconnect_api_keys_settings($form, &$form_state) {
     '#required' => TRUE,
     '#title' => t('Application Secret'),
     '#default_value' => variable_get('fbconnect_skey', NULL),
-    '#description' => t('Do not share your secret key with anyone'),
+    '#description' => t('Also called the <em>OAuth client_secret</em> value on Facebook App settings pages.'),
   );
 
   $form['fbconnect_language_code'] = array(
@@ -56,7 +56,7 @@ function fbconnect_api_keys_settings($form, &$form_state) {
   );
 
   $form['fbconnect_connect_url'] = array(
-    '#type' => 'item',
+    '#type' => 'textfield',
     '#title' => t('Connect url'),
     '#description' => t('Copy this value into Facebook Applications on Connect settings tab'),
     '#value' => variable_get('fbconnect_connect_url', $GLOBALS['base_url'] . '/'),
@@ -220,18 +220,17 @@ function fbconnect_appearance_settings($form, &$form_state) {
 function fbconnect_fbapp_settings($form, &$form_state) {
   if (!facebook_client()) {
     drupal_set_message(t('Ensure that you entered valid api keys.'), 'error');
-    drupal_goto('admin/config/fbconnect');
+    drupal_goto('admin/config/people/fbconnect');
   }
-
+  $fbuid = fbconnect_get_fbuid();
   if (!fbconnect_get_fbuid()) {
     $button_attr = array('text' => t('Connect with your Facebook account'));
     $form['fbconnect'] = array(
-      '#value' => fbconnect_render_button($button_attr),
+      '#prefix' => "<div>". t('You are not connected to the facebook account that this application is registered to') . "</div>",      
+      '#markup' => fbconnect_render_button($button_attr),
     );
-
     return $form;
   }
-
   $form['fbconnect_base_domaine'] = array(
     '#type' => 'textfield',
     '#title' => t('Base Domain Url'),

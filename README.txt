@@ -24,18 +24,19 @@ Also this tab allows to unlink your Facebook account.
 
 -- REQUIREMENTS --
 PHP 5.2 or higher versions. 
-Drupal 6.x. 
-Facebook PHP Library: http://github.com/facebook/php-sdk/
+Drupal 7.x. 
+Facebook PHP Library: http://github.com/facebook/php-sdk/  use version 2 as version 3 is not supported.
 Facebook API key: http://www.facebook.com/developers/
 
 
 -- INSTALLATION --
   1. Upload the 'fbconnect' folder into your module directory and activate the module,
   
-  2. Upload facebook-php-sdk (http://github.com/facebook/php-sdk/) into fbconnect module folder (or into libraries folder, 
+  2. Upload facebook-php-sdk/src/facebook.php (http://github.com/facebook/php-sdk/) into fbconnect module folder (or into libraries folder, 
     if you want to use it with the libraries module, http://drupal.org/project/libraries)
     
-     To ensure that you installed correctly check file : <fbconnect folder>/facebook-php-sdk/src/facebook.php must be accessible
+     To ensure that you installed correctly check file : <fbconnect folder>/facebook.php must be accessible
+     OR /sites/all/libraries/facebook/facebook.php must be accessible
      
  -- OR -- 
   Use drush_make script instead of steps 1 and 2:

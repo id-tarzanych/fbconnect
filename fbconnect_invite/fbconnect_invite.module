@@ -21,7 +21,7 @@ function fbconnect_invite_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['admin/config/fbconnect/invite'] = array(
+  $items['admin/config/people/fbconnect/invite'] = array(
     'title' => 'Friends Invite',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('fbconnect_invite_settings'),
@@ -62,8 +62,10 @@ function fbconnect_invite_theme() {
  * Implements hook_block_info().
  */
 function fbconnect_invite_block_info() {
-  $blocks['facebook_friends']['info']  = t('Facebook Friends');
-  $blocks['facebook_friends']['cache'] = BLOCK_NO_CACHE;
+  $blocks['facebook_friends'] = array(
+    'info' => t('Facebook Friends'), 
+    'cache' => DRUPAL_NO_CACHE,
+  );
   return $blocks;
 }
 

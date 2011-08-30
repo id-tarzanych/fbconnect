@@ -9,7 +9,7 @@ Drupal.fbconnect.init = function () {
     Drupal.fbconnect.initLogoutLinks(context);
   }
   
-  if (Drupal.settings.fbconnect.loginout_mode == 'auto') {
+  if (Drupal.settings.fbconnect.loginout_mode == 'auto') { 
     FB.Event.subscribe('auth.sessionChange', Drupal.fbconnect.reload_ifUserConnected);
 //    FB.Event.subscribe('auth.login', function(response) {
 //      console.log('event auth.login');
@@ -20,10 +20,9 @@ Drupal.fbconnect.init = function () {
 }
 
 Drupal.fbconnect.logout = function(keep_fbaccount_logged) {
-  var logout_url = Drupal.settings.basePath + 'logout'; 
-  
-  if (!keep_fbaccount_logged) {
-    FB.logout(function(response) { 
+  var logout_url = Drupal.settings.basePath + 'user/logout'; 
+  if (!keep_fbaccount_logged) {   
+    FB.logout(function(response) {
       window.location.href = logout_url; 
     });
   }
@@ -45,15 +44,16 @@ Drupal.fbconnect.initLogoutLinks = function(context) {
   var loginout_mode = Drupal.settings.fbconnect.loginout_mode;
   var user          = Drupal.settings.fbconnect.user;
   var basePath      = Drupal.settings.basePath;
-  var logout_url    = basePath + 'logout'; 
-  var links         = $('a[href='+ logout_url +']', context).not('.logout_link_inited');
-  
+  var logout_url    = basePath + 'user/logout'; 
+  var links         = jQuery('a[href='+ logout_url +']', context).not('.logout_link_inited');
+
   if (loginout_mode == 'manual') return;
   
-  links.addClass('logout_link_inited').click(function() {
+  links.addClass('logout_link_inited').bind('click',function() {
     var fbuid = FB.getSession() && FB.getSession().uid;
+ 
     if (!user.fbuid || user.fbuid != fbuid) return;
-    if (loginout_mode == 'auto') { 
+    if (loginout_mode == 'auto') {
       Drupal.fbconnect.logout();
     }
     else if (loginout_mode == 'ask') {    
@@ -100,7 +100,7 @@ function facebook_onlogin_ready() {
   if (!FB.getSession()) {
     return;
   }
-  $("#fbconnect-autoconnect-form").submit();
+  jQuery("#fbconnect-autoconnect-form").submit();
 }
 
 /**
@@ -151,8 +151,9 @@ Drupal.fbconnect.PopupDialog.prototype.callback = function(event, data) {
     break;
     
   case 'close':
-    var btn = this.findButton('cancel'); 
-    if (btn) this.callback('click', btn);
+    this.close();
+    /*var btn = this.findButton('cancel'); 
+    if (btn) this.callback('click', btn); */
     break;
     
   case 'load':
@@ -169,7 +170,7 @@ Drupal.fbconnect.PopupDialog.prototype.prepareDefaults = function(options) {
     'showLoading'     : false,
     'hideUntilLoaded' : false
   };  
-  $.extend(this.options, defaults, options);
+  jQuery.extend(this.options, defaults, options);
   
   this.__close_handler = this.createHandler('close', {});
   this.options.dialog = this; 
@@ -204,10 +205,10 @@ Drupal.fbconnect.PopupDialog.prototype.findButton = function(name) {
 
 Drupal.theme.prototype.fb_popup_dialog_buttons = function(buttons, dialog) {
   buttons = buttons || {};
-  var container = $('<div class="dialog_buttons"></div>');
-  
+  var container = jQuery('<div class="dialog_buttons"></div>');
+
   jQuery.each(buttons, function(i, btn) {
-    var button = $('<input type="button" class="dialog_inputbutton">');
+    var button = jQuery('<input type="button" class="dialog_inputbutton">');
     if (!btn['name']) btn['name'] = i;
     if (btn.attr) button.attr(btn.attr);
     if (btn['class']) button.addClass(btn['class']);
@@ -234,7 +235,7 @@ Drupal.theme.prototype.fb_popup_dialog = function(options) {
     '</div>'
   ];
   
-  $(elements.join("\n")).each(function() {
+  jQuery(elements.join("\n")).each(function() {
     container.appendChild(this);
   });
   if (options.buttons) {
@@ -254,7 +255,7 @@ Drupal.theme.prototype.fbml_name = function(fbuid, options) {
     'linked' : false
   };
   
-  options = $.extend({}, defaults, options);
+  options = jQuery.extend({}, defaults, options);
   
   output.push('" useyou="'+ (!!options.useyou ? 'true' : 'false') +'"');
   output.push('" linked="'+ (!!options.linked ? 'true' : 'false') +'"');

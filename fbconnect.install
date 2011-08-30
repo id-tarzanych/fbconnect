@@ -60,7 +60,7 @@ function fbconnect_requirements($phase) {
         'title' => $t('FBConnect'),
         'value' => $t('Not configured'),
         'severity' => REQUIREMENT_WARNING,
-        'description' => $t('Please ensure that you entered Application ID and Secret Key. !link', array('!link' => l($t('Settings page'), 'admin/config/fbconnect'))),
+        'description' => $t('Please ensure that you entered Application ID and Secret Key. !link', array('!link' => l($t('Settings page'), 'admin/config/people/fbconnect'))),
       );
     }
   }
@@ -209,5 +209,5 @@ function _fbconnect_change_user_mail_field($action = 'install') {
     fbconnect_schema_alter($schema);
   }
   db_change_field('users', 'mail', 'mail', $schema['users']['fields']['mail']);
-  return $res;
+  //return $res;
 }
