@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 define('FBCONNECT_STREAM_PUBLISH_NONE', 0);
 define('FBCONNECT_STREAM_PUBLISH_ALL', 1);
@@ -7,7 +6,7 @@ define('FBCONNECT_STREAM_PUBLISH_NODES', 2);
 define('FBCONNECT_STREAM_PUBLISH_COMMENTS', 3);
 
 /**
- * Impletementation of hook_init().
+ * Implements hook_init().
  */
 function fbconnect_stream_publish_init() {
   if (isset($_SESSION['fbconnect_feed'])) {
@@ -17,7 +16,7 @@ function fbconnect_stream_publish_init() {
 }
 
 /**
- * Impletementation of hook_theme().
+ * Implements hook_theme().
  */
 function fbconnect_stream_publish_theme() {
   return array(

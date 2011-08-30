@@ -1,5 +1,4 @@
 <?php
-// $Id: fbconnect.admin.inc,v 1.15 2010/03/21 16:26:03 vectoroc Exp $
 
 /**
  * @file
@@ -82,14 +81,14 @@ function fbconnect_appearance_settings($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t('Fast registration mode'),
     '#default_value' => variable_get('fbconnect_fast_reg', NULL),
-    '#description' => t('Enable this mode will bypass drupal\'s standard registration form.'),
+    '#description' => t("Enable this mode will bypass Drupal's standard registration form."),
   );
 
   $form['site']['fbconnect_fast_reg_autoname'] = array(
     '#type' => 'checkbox',
     '#title' => t('Assign new random name on name conflict during Fast Registration'),
     '#default_value' => variable_get('fbconnect_fast_reg_autoname', NULL),
-    '#description' => t('Creates a new random name for the user if the user\'s Facebook is already taken by another user on this site. The random name will look something like fbuser123.'),
+    '#description' => t("Creates a new random name for the user if the user's Facebook is already taken by another user on this site. The random name will look something like fbuser123."),
   );
 
   $form['site']['fbconnect_loginout_mode'] = array(
@@ -101,7 +100,7 @@ function fbconnect_appearance_settings($form, &$form_state) {
       'auto'   => t('Auto login/logout'),
     ),
     '#default_value' => variable_get('fbconnect_loginout_mode', FALSE),
-    '#description' => t('Login to drupal/logout from facebook. Enable this if you don\'t want to logout automatically from facebook.'),
+    '#description' => t("Login to Drupal/logout from facebook. Enable this if you don't want to logout automatically from facebook."),
   );
 
   // TODO: rename to more clear name
@@ -182,7 +181,7 @@ function fbconnect_appearance_settings($form, &$form_state) {
   $form['display']['fbconnect_pic_size_profile'] = array(
     '#type' => 'select',
     '#title' => t('Profile Facebook picture size'),
-    '#description' => t('This will set the picture size when viewing a user\'s profile page. If your user decides to use his facebook picture, choose its size here.'),
+    '#description' => t("This will set the picture size when viewing a user's profile page. If your user decides to use his facebook picture, choose its size here."),
     '#default_value' => variable_get('fbconnect_pic_size_profile', 'small'),
     '#options' => $options_pic_size,
   );
@@ -190,7 +189,7 @@ function fbconnect_appearance_settings($form, &$form_state) {
   $form['display']['fbconnect_pic_logo'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show Facebook Logo'),
-    '#description' => t('Uncheck this if you don\'t want to display the facebook logo on the user picture.'),
+    '#description' => t("Uncheck this if you don't want to display the facebook logo on the user picture."),
     '#default_value' => variable_get('fbconnect_pic_logo', TRUE),
   );
 
@@ -226,7 +225,7 @@ function fbconnect_fbapp_settings($form, &$form_state) {
   if (!fbconnect_get_fbuid()) {
     $button_attr = array('text' => t('Connect with your Facebook account'));
     $form['fbconnect'] = array(
-      '#prefix' => "<div>". t('You are not connected to the facebook account that this application is registered to') . "</div>",      
+      '#prefix' => '<div>' . t('You are not connected to the facebook account that this application is registered to') . '</div>',
       '#markup' => fbconnect_render_button($button_attr),
     );
     return $form;
@@ -241,7 +240,7 @@ function fbconnect_fbapp_settings($form, &$form_state) {
   $form['fbconnect_connect_url'] = array(
     '#type' => 'textfield',
     '#title' => t('Connect Url'),
-    '#description' => t('Your site\'s main URL.'),
+    '#description' => t("Your site's main URL."),
     '#default_value' => variable_get('fbconnect_connect_url', $GLOBALS['base_url'] . '/'),
   );
 

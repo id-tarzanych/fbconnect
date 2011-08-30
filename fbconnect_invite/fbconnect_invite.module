@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Implements hook_menu().
@@ -63,7 +62,7 @@ function fbconnect_invite_theme() {
  */
 function fbconnect_invite_block_info() {
   $blocks['facebook_friends'] = array(
-    'info' => t('Facebook Friends'), 
+    'info' => t('Facebook Friends'),
     'cache' => DRUPAL_NO_CACHE,
   );
   return $blocks;

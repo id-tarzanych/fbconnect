@@ -1,8 +1,8 @@
 <?php
-// $Id$
 
 /**
- * @file rules integration for the fbconnect module
+ * @file
+ * Rules integration for the fbconnect module.
  *
  * @addtogroup rules
  * @{
