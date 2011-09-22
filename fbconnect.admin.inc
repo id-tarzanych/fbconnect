@@ -58,7 +58,7 @@ function fbconnect_api_keys_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Connect url'),
     '#description' => t('Copy this value into Facebook Applications on Connect settings tab'),
-    '#value' => variable_get('fbconnect_connect_url', $GLOBALS['base_url'] . '/'),
+    '#default_value' => variable_get('fbconnect_connect_url', $GLOBALS['base_url'] . '/'),
   );
 
   //  locale

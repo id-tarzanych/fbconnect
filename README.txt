@@ -22,7 +22,7 @@ Also this tab allows to unlink your Facebook account.
 -- REQUIREMENTS --
 PHP 5.2 or higher versions.
 Drupal 7.x.
-Facebook PHP Library: http://github.com/facebook/php-sdk/  use version 2 as version 3 is not supported.
+Facebook PHP 3.x Library or higher: http://github.com/facebook/php-sdk/ (OAuth 2.0 Support Now)
 Facebook API key: http://www.facebook.com/developers/
 
 
@@ -49,18 +49,6 @@ libraries[facebook-php-sdk][destination] = "modules/fbconnect"
 
   5. Configure the module through admin interface (admin/settings/fbconnect) using the information provided by Facebook
     (Application ID, Application Secret).
-
-  6. In order for the user's browser to correctly recognize XFBML tags, you need to specify that the page is in XHTML.
-    Edit the "page.tpl.php" file of your current theme. edit the <html> tag and add the facebook xmlns for rendering XFBML.
-
-    Example : <html xmlns:fb="http://www.facebook.com/2008/fbml"
-                    xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php print $language->language ?>"
-                    lang="<?php print $language->language ?>" dir="<?php print $language->dir ?>">
-
-    Note: The xmlns:fb attribute (xmlns:fb="http://www.facebook.com/2008/fbml") is required for proper rendering on IE.
-     (Namespaces don't have to point to a valid page, they just need to be a valid Internationalized Resource Identifier (IRI).
-
-  7. Also make sure that your page.tpl.php contains <?php print $closure ?>
 
 -- FAQ --
 

@@ -233,18 +233,14 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
 
       // Render fbconnect on login block.
     case 'user_login_block':
-      if (!empty($_GET['destination']) && ($_GET['destination'] != 'fbconnect/link') && facebook_client()) {
+      if ((empty($_GET['destination']) || (!empty($_GET['destination']) && ($_GET['destination'] != 'fbconnect/link'))) && facebook_client()) {
 
-        #848354 : ask user for email permission when account linking is disabled
-        $attr = array();
-        if (variable_get('fbconnect_fast_reg', 0) && variable_get('fbconnect_reg_options', 0)) {
-          $attr = array('perms' => 'email');
-        }
+        $attr = array('scope' => 'email');
 
         $form['fbconnect_button'] = array(
           '#type' => 'item',
-          '#description' => t('Sign in using Facebook'),
-          '#value' => fbconnect_render_button($attr),
+          '#title' => t('Sign in using Facebook'),
+          '#markup' => fbconnect_render_button($attr),
           '#weight' => 1,
           '#id' => 'fbconnect_button',
         );
@@ -437,9 +433,7 @@ function fbconnect_get_fbuid($check_connected = FALSE) {
   global $user;
 
   $client = facebook_client();
-  $session = $client->getSession();
-  if ($client && $session != NULL) {
-    $fbuid = $session['uid'];
+  if ($client && $fbuid = $client->getUser()) {
 
     if ($check_connected && $fbuid) {
       if (_get_user_fbuid($user->uid) != $fbuid) {
@@ -482,6 +476,7 @@ function fbconnect_render_js() {
 function fbconnect_page_alter(&$page) {
   if (facebook_client() && !_fbconnect_is_excluded_page($_GET['q'])) {
     $config = fbconnect_get_config();
+    $channel_uri = preg_replace("@'@msi", "\'", "http://" . $_SERVER['HTTP_HOST'] . "/" . drupal_get_path('module', 'fbconnect') . "/channel.html");
     $page['page_bottom']['fb-init-code'] = array(
       '#type' => 'markup',
       '#markup' => '<div id="fb-root"></div>
@@ -492,7 +487,9 @@ function fbconnect_page_alter(&$page) {
           status : true, // check login status
           cookie : true, // enable cookies to allow the server to access the session
           xfbml : true,
-          logging: \'' . $config['debug'] . '\'
+          logging: \'' . $config['debug'] . '\',
+          channelURL: \'' . $channel_uri . '\',
+          oauth  : true
         });
 
         jQuery(document).trigger(\'fb:init\');
@@ -571,7 +568,7 @@ function fbconnect_autoconnect_form_submit($form, &$form_state) {
           $form_state['redirect'] = array('fbconnect/register/prompt', drupal_get_destination() );
         }
 
-        #805846 : No linking with FB page appears, when "destination" variable exist in url
+        // #805846 : No linking with FB page appears, when "destination" variable exist in url
         unset($_GET['destination']);
       }
       elseif ($uid) {
@@ -985,4 +982,11 @@ function fbconnect_menu_alter(&$callbacks) {
 
 function _fbconnect_is_excluded_page($path) {
   return drupal_match_path($path, variable_get('fbconnect_exclude_patterns', ''));
+}
+
+/**
+ * Implements hook_rdf_namespaces().
+ */
+function fbconnect_rdf_namespaces() {
+  return array('fb' => 'http://www.facebook.com/2008/fbml');
 }
