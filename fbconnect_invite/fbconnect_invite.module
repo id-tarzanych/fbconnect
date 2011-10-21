@@ -77,7 +77,7 @@ function fbconnect_invite_block_view($delta) {
     $cid    = 'fbconnect:' . $fbuid;
     $cached = cache_get($cid, 'cache_block');
 
-    if ($cached->data) {
+    if ($cached !== FALSE) {
       $content = $cached->data;
     }
     else {
@@ -88,6 +88,9 @@ function fbconnect_invite_block_view($delta) {
         }
         $content = theme('item_list', array('items' => $row));
         cache_set($cid, $content, 'cache_block', REQUEST_TIME + 3600);
+      } else {
+        // no friends, no content
+        $content = '';
       }
     }
 
@@ -95,7 +98,7 @@ function fbconnect_invite_block_view($delta) {
     if (!drupal_is_front_page()) {
       $link_options = array('query' => drupal_get_destination());
     }
-    $invite_link = l(t('Invite Friends'), 'fbconnect/invite/friends', $link_options);
+    $invite_link = l(t('Invite Friends from FB'), 'fbconnect/invite/friends', $link_options);
 
     $blocks['subject'] = t('Facebook Friends');
     $blocks['content'] = $invite_link . $content;
@@ -166,6 +169,7 @@ FBML;
  * Get facebook friend who has_added_app.
  */
 function fbconnect_get_connected_friends($fbuid) {
+  $fbid=array();
   if (facebook_client()) {
     $query = "SELECT uid, has_added_app FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = $fbuid)";
     try {
@@ -194,17 +198,14 @@ function fbconnect_get_connected_friends($fbuid) {
       }
 
       if ($fbid) {
+        $friends=array();
         $res = db_select('fbconnect_users', 'f')
-          ->fields('f', 'uid')
-          ->condition('fbuid', implode($fbid, ','), 'IN')
+          ->fields('f', array('uid'))
+          ->condition('f.fbuid', $fbid, 'IN')
           ->execute();
         while ($uid = $res->fetchField()) {
-          $user = user_load($uid);
-          if ($user->fb_visible) {
-            $friends[] = $user;
-          }
+          $friends[] = user_load($uid);
         }
-
         return $friends;
       }
     }
@@ -230,13 +231,6 @@ function fbconnect_invite_settings($form, &$form_state) {
     '#default_value' => variable_get('fbconnect_invite_name', variable_get('site_name', NULL)),
   );
 
-  // TODO: remove it
-  //  $form['fbconnect_invite_dest'] = array(
-  //    '#type' => 'textfield',
-  //    '#title' => t('Destination, after user\'s valid or skip invite friend form'),
-  //    '#default_value' => variable_get('fbconnect_invite_dest', $base_url),
-  //  );
-  //
   return system_settings_form($form);
 }
 

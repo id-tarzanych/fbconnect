@@ -76,6 +76,42 @@ function fbconnect_prompt_page_links() {
 }
 */
 
+
+/**
+ * Menu callback.
+ * Logs user into site or redirects.
+ */
+function fbconnect_login_page($form, $form_state = array()) {
+  $conf = fbconnect_get_config();
+  $data = fbconnect_get_user_info(array('name', 'email'));
+  // User not logged into facebook we dont have any information for them, let them log in.
+  if (empty($data)) {
+      return facebook_login_page($form, $form_state);
+  }
+  // Check if user has already registered with their facebook account.
+  $user_id = _is_fbconnect_user($data['id']);
+  if ($user_id) {
+    // User allready registered facebook account to site, log them in
+    $form_state['uid'] = $user_id;
+    user_login_submit($form, $form_state);
+    drupal_set_message('You have been successfully logged in.');
+    drupal_goto('user/' . $user_id);
+  }
+  elseif ( _email_allready_exist($data['email'])) {
+    // The user was not found in the fbconnect_users table, but the emial from facebook might allready have an account on coracle.
+    // Redirect user to the login page with a message.
+    drupal_set_message(t('This email address is allready registered to an account. Please log in to this account with the username and password provided during registration'));
+    $options = array('query' => array(
+      'fbconnect' => 'true'
+    ));
+    drupal_goto('user/login', $options);
+  }
+  else {
+    drupal_set_message('You do not have an account with this site. Create an account on this site with through facebook !here', array('!here' => l('fbconnect/register/create')));
+  }
+
+}
+
 /**
  * Menu callback.
  * Called when user perform facebook registration
@@ -85,19 +121,20 @@ function fbconnect_register_page($form, $form_state = array()) {
   $data = fbconnect_get_user_info(array('name', 'email'));
   // User not logged into facebook we dont have any information for them, let them log in.
   if (empty($data)) {
-      return facebook_login_page($form, $form_state);
+    return facebook_login_page($form, $form_state);
   }
-  //check if user has allready registered with thier facebook account
-  $user_id = _is_fbconnect_user($data['id']);
-  if ($user_id) {
-    //user allready registered facebook account to site, log them in
-    $form_state['uid'] = $user_id;
+  // Check if user has allready registered with thier facebook account
+  $uid = _is_fbconnect_user($data['id']);
+  if ($uid) {
+    // User already registered facebook account to site, log them in
+    $form_state['uid'] = $uid;
     user_login_submit($form, $form_state);
   }
-  elseif ( _email_allready_exist($data['email'])) {
-    //the user was not found in the fbconnect_users table, but the emial from facebook might allready have an account on coracle.
-    //Redirect user to the login page with a message.
-    drupal_set_message(t('This email address is allready registered to an account. Please log in to this account with the username and password provided during registration'));
+  elseif (_email_allready_exist($data['email'])) {
+    // The user was not found in the fbconnect_users table, but the
+    // email from facebook might already have an account.
+    // Redirect user to the login page with a message..
+    drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
     $options = array('query' => array(
       'fbconnect' => 'true'
     ));
@@ -190,12 +227,13 @@ function fbconnect_register_page($form, $form_state = array()) {
 
 function facebook_login_page(&$form, $form_state = array()) {
     $facebook = facebook_client();
-    $login_url = $facebook->getLoginUrl();
+    $params['scope'] = 'email';
+    $login_url = $facebook->getLoginUrl($params);
     $form['log_in_to_facebook'] = array(
-      '#title' => t('You are not logged in to facebook you would have to log in AND give the site access to use this feature'),
+      '#title' => t('You must login to Facebook AND give the site access to use this feature'),
       '#description' => t('Log in using your facebook account'),
       '#type' => 'item',
-      '#markup' => l(t('Log in to Facebook'), $login_url),
+      '#markup' => l(t('Login using your Facebook account'), $login_url),
     );
     return $form;
 }
@@ -314,7 +352,7 @@ function fbconnect_user_settings_form($form, $form_state, $account) {
       'disabled' => 'disabled',
     );
     $form['fb_avatar']['#description'] = t('Enable user picture support in !link', array(
-      '!link' => l(t('User settings'), 'admin/user/settings'),
+      '!link' => l(t('User settings'), 'admin/config/people/accounts'),
     ));
   }
 
@@ -333,7 +371,7 @@ function fbconnect_user_settings_form($form, $form_state, $account) {
   $form['fbconnect']['profile'] = array(
     '#type' => 'item',
     '#title' => t('Linked to this Facebook account'),
-    '#value' => '<fb:name uid="' . $account->fbuid . '" useyou="false" linked="true"></fb:name>',
+    '#markup' => '<fb:name uid="' . $account->fbuid . '" useyou="false" linked="true"></fb:name>',
   );
 
   $form['fbconnect']['unlink'] = array(
@@ -387,7 +425,6 @@ function theme_fbconnect_user_picture_override($variables) {
   $account = $variables['account'];
   $user_url = $variables['user_url'];
   $size = $variables['size'];
-  $logo = $variables['logo'];
   $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
   $path = $protocol . '://graph.facebook.com/' . $fbuid . '/picture?type=' . $size;
   $image = theme('image', array('path' => $path, 'alt' => $account->name));
