@@ -1,5 +1,5 @@
 name = Fbconnect
-dependencies[] = libraries
+dependencies[] = libraries (>= 2.0)
 description = Allows users to connect with Facebook account
 package = "Authentication"
 core = 7.x
