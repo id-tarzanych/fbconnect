@@ -31,7 +31,7 @@ Facebook API key: http://www.facebook.com/developers/
      the modules.
 
   2. Upload facebook-php-sdk library (http://github.com/facebook/php-sdk/) into the libraries
-     folder.
+     folder so that it looks like 'sites/all/libraries/facebook-php-sdk/src/facebook.php'.
 
  -- OR --
   Use drush_make script instead of steps 1 and 2:
