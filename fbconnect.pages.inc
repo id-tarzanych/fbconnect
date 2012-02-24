@@ -219,7 +219,6 @@ function fbconnect_register_page($form, $form_state = array()) {
     }
 
     fbconnect_register_form_submit($form, $form_state);
-    drupal_goto();
   }
 
   return $form;
