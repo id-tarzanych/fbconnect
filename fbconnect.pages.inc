@@ -295,17 +295,18 @@ function fbconnect_register_form_submit($form, &$form_state) {
  */
 function fbconnect_user_identities($form_id, $account) {
   $conf = fbconnect_get_config();
-  $fbuid = fbconnect_get_fbuid();
+  $current_fbuid = fbconnect_get_fbuid(); // fbuid of currently logged in FB user
+  $fbuid = _get_user_fbuid($account->uid); // fbuid of account being edited
   drupal_set_title(check_plain($account->name));
   $uid = NULL;
   if ($fbuid) {
     $uid = _is_fbconnect_user($fbuid);
     $account->fbuid = $fbuid;
-    if (!$uid) {
-        // We have facebook access for this user but we dont have the user in the fbconnect_users table, add him.
-        fbconnect_register($account->uid, $fbuid);
-        $uid = _is_fbconnect_user($fbuid);
-    }
+  }
+  if (!$uid && !empty($current_fbuid)) {
+    // We have facebook access for this user but we dont have the user in the fbconnect_users table, add him.
+    fbconnect_register($account->uid, $current_fbuid);
+    $uid = _is_fbconnect_user($current_fbuid);
   }
   if (isset($account->fbuid) && $account->fbuid) {
     return drupal_get_form('fbconnect_user_settings_form', $account);
