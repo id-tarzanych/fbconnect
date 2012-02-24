@@ -280,9 +280,8 @@ function fbconnect_register_form_submit($form, &$form_state) {
   }
 
   fbconnect_register($user->uid, $fbuid);
-  $data['fb_avatar'] = isset($form_state['values']['fb_avatar']) ? $form_state['values']['fb_avatar'] : 0;
-  $data['fb_visible'] = $form_state['values']['fb_visible'];
-
+  $data['data']['fb_avatar'] = isset($form_state['values']['fb_avatar']) ? $form_state['values']['fb_avatar'] : 0;
+  $data['data']['fb_visible'] = $form_state['values']['fb_visible'];
   $user = user_save($user, $data);
 
   $form_state['uid'] = $user->uid;
