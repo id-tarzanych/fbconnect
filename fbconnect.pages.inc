@@ -152,7 +152,7 @@ function fbconnect_register_page($form, $form_state = array()) {
     return;
   }
 
-  $form['account']['name']['#value'] = $data['name'];
+  $form['account']['name']['#value'] = empty($form_state['input']['name']) ? $data['name'] : $form_state['input']['name'];
   $form['account']['mail']['#parents'] = array('name');
   $form['account']['mail']['#value'] = $data['email'];
   $form['account']['mail']['#parents'] = array('mail');
