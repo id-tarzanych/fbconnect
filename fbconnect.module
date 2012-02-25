@@ -259,6 +259,19 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
       }
       break;
 
+    case 'user_login_block':
+      if ((empty($_GET['destination']) || $_GET['destination'] != 'fbconnect/link') && facebook_client()) {
+        $form['fbconnect_button'] = array(
+          '#type' => 'item',
+          '#title' => t('Sign in using Facebook'),
+          '#markup' => fbconnect_render_button(),
+          '#weight' => 1,
+          '#id' => 'fbconnect_button',
+        );
+        // Add a function callback to call after user is loged in
+        $form['#submit'][] = 'fbconnect_add_user_afterlogin_submit';
+      }
+
   endswitch;
 }
 
