@@ -449,7 +449,12 @@ function fbconnect_get_config() {
     $config['app_id'] = variable_get('fbconnect_appid', NULL);
     $config['secret_api_key'] = variable_get('fbconnect_skey', NULL);
     $config['debug'] = variable_get('fbconnect_debug', FALSE);
-    $config['connect_js'] = "document.location.protocol + '//connect.facebook.net/$config[language_code]/all.js'";
+    if (variable_get('fbconnect_ssl', FALSE)) {
+      $config['connect_js'] = "'https://connect.facebook.net/$config[language_code]/all.js'";
+    }
+    else {
+      $config['connect_js'] = "document.location.protocol + '//connect.facebook.net/$config[language_code]/all.js'";
+    }
 
     if (module_exists('i18n')) {
       global $language;
@@ -578,6 +583,10 @@ function fbconnect_autoconnect_form($form) {
   }
   else {
     $form['#action'] = url($_GET['q'], array('query' => drupal_get_destination()));
+  }
+
+  if (variable_get('fbconnect_ssl', FALSE)) {
+    $form['#https'] = TRUE;
   }
 
   $form['connect'] = array(

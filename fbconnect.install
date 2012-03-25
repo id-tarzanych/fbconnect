@@ -102,6 +102,7 @@ function fbconnect_uninstall() {
   variable_del('fbconnect_pic_size_profile');
   variable_del('fbconnect_reg_options');
   variable_del('fbconnect_skey');
+  variable_del('fbconnect_ssl');
 }
 
 /**

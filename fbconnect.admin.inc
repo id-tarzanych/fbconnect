@@ -53,6 +53,12 @@ function fbconnect_api_keys_settings($form, &$form_state) {
     '#title' => t('Debug mode'),
     '#default_value' => variable_get('fbconnect_debug', FALSE),
   );
+  $form['fbconnect_ssl'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Always use SSL on authentication'),
+    '#description' => t('Enable this if you want to use SSL on authentication.'),
+    '#default_value' => variable_get('fbconnect_ssl', FALSE),
+  );
 
   $form['fbconnect_connect_url'] = array(
     '#type' => 'textfield',
