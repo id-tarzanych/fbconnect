@@ -242,7 +242,7 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
       }
       // Check if there is a get paramater set(fbconnect=true)
       if (isset($_GET['fbconnect']) && $_GET['fbconnect'] == 'true') {
-        // Add a function callback to call after user is loged in
+        // Add a function callback to call after user is logged in
         $form['#submit'][] = 'fbconnect_add_user_afterlogin_submit';
       }
 
@@ -251,7 +251,7 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
         $account = $form['_account']['#value'];
         if ($account->data['fb_avatar'] && isset($form['picture'])) {
           $form['picture']['fb_avatar'] = array(
-            '#value' => t('You are currently using your Facebook picture, if you delete or load a new picture, your facebook picture will no longer be updated.'),
+            '#value' => t('You are currently using your Facebook picture, if you delete or load a new picture, your Facebook picture will no longer be updated.'),
             '#weight' => 0,
           );
           $form['#submit'][] = 'fbconnect_user_edit_submit';
@@ -268,7 +268,7 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
           '#weight' => 1,
           '#id' => 'fbconnect_button',
         );
-        // Add a function callback to call after user is loged in
+        // Add a function callback to call after user is logged in
         $form['#submit'][] = 'fbconnect_add_user_afterlogin_submit';
       }
 
@@ -294,7 +294,7 @@ function fbconnect_add_user_afterlogin_submit($form, &$form_state) {
         fbconnect_register($user->uid, $data['id']);
     }
     else {
-        drupal_set_message(t('You have loged into the website with an account that does not have the same email as your facebook account'));
+        drupal_set_message(t('You have logged into the website with an account that does not have the same email as your Facebook account.'));
     }
 }
 
@@ -307,7 +307,7 @@ function fbconnect_user_edit_submit($form, &$form_state) {
     $user = user_load(arg(1));
     $data['fb_avatar'] = 0;
     user_save($user, $data);
-    drupal_set_message(t('Auto import of your facebook picture has been disabled'));
+    drupal_set_message(t('Auto import of your Facebook picture has been disabled.'));
   }
 }
 
