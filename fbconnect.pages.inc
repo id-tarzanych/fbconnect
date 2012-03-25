@@ -292,6 +292,11 @@ function fbconnect_register_form_submit($form, &$form_state) {
   $form_state['uid'] = $user->uid;
   user_login_submit(array(), $form_state);
   $_SESSION['fbconnect_feed']['type'] = 'register';
+
+  $conf = fbconnect_get_config();
+  if ($conf['fast_reg_mode']) {
+    drupal_goto('user');
+  }
 }
 
 /**
