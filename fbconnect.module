@@ -238,7 +238,29 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
     $form['account']['mail']['#maxlength'] = 320;
   }
 
-  switch ($form_id) :
+  switch ($form_id) {
+    case 'user_register_form':
+      // Add the FBConnect button to the user registration form, if enabled in
+      // admin settings.
+      if (variable_get('fbconnect_user_reg_display', TRUE)) {
+        $weight = (variable_get('fbconnect_user_reg_location', 'top') == 'top') ? -50 : 50;
+        // create the FBConnect button
+        $attr = array();
+        if (variable_get('fbconnect_fast_reg', 0) && variable_get('fbconnect_reg_options', 0)) {
+          $attr = array('perms' => 'email');
+        }
+        // Don't display if "fast reg" is enabled
+        if (!variable_get('fbconnect_fast_reg', 0)) {
+          $form['fbconnect_button'] = array(
+            '#type' => 'item',
+            '#description' => t('Sign in using Facebook'),
+            '#markup' => fbconnect_render_button($attr),
+            '#weight' => $weight,
+          );
+        }
+      }
+      break;
+
     case 'user_login':
       if (!empty($_GET['destination']) && ($_GET['destination'] == 'fbconnect/link')) {
         drupal_set_message(t('Please log in, in order to link your account with Facebook Connect'));
@@ -249,6 +271,7 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
         // Add a function callback to call after user is logged in
         $form['#submit'][] = 'fbconnect_add_user_afterlogin_submit';
       }
+      break;
 
     case 'user_profile_form':
       if (variable_get('user_pictures', 0) && isset($form['_account'])) {
@@ -275,8 +298,9 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
         // Add a function callback to call after user is logged in
         $form['#submit'][] = 'fbconnect_add_user_afterlogin_submit';
       }
+      break;
 
-  endswitch;
+  }
 }
 
 /**

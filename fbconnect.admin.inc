@@ -122,6 +122,21 @@ function fbconnect_appearance_settings($form, &$form_state) {
     '#default_value' => variable_get('fbconnect_reg_options', 0),
     '#description' => t('Disables the option to link local account to a FB account on registration'),
   );
+  $form['site']['fbconnect_user_reg_display'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display FBConnect button on registration form'),
+    '#default_value' => variable_get('fbconnect_user_reg_display', TRUE),
+    '#description' => t('Add the FBConnect button to the "create new account" form. This will only appear if "fast registration mode" is not selected.'),
+  );
+  $form['site']['fbconnect_user_reg_location'] = array(
+    '#type'=> 'select',
+    '#title' => t('Location of FBConnect button on registration form'),
+    '#default_value' => variable_get('fbconnect_user_reg_location', 'top'),
+    '#options' => array(
+      'top' => t('Top'),
+      'bottom' => t('Bottom'),
+    ),
+  );
 
   $form['display'] = array(
     '#title' => t('Display Settings'),
