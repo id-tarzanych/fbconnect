@@ -91,16 +91,16 @@ function fbconnect_login_page($form, $form_state = array()) {
   // Check if user has already registered with their facebook account.
   $user_id = _is_fbconnect_user($data['id']);
   if ($user_id) {
-    // User allready registered facebook account to site, log them in
+    // User already registered facebook account to site, log them in
     $form_state['uid'] = $user_id;
     user_login_submit($form, $form_state);
     drupal_set_message('You have been successfully logged in.');
     drupal_goto('user/' . $user_id);
   }
-  elseif ( _email_allready_exist($data['email'])) {
-    // The user was not found in the fbconnect_users table, but the emial from facebook might allready have an account on coracle.
+  elseif ( _email_already_exist($data['email'])) {
+    // The user was not found in the fbconnect_users table, but the emial from facebook might already have an account on coracle.
     // Redirect user to the login page with a message.
-    drupal_set_message(t('This email address is allready registered to an account. Please log in to this account with the username and password provided during registration'));
+    drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
     $options = array('query' => array(
       'fbconnect' => 'true'
     ));
@@ -123,14 +123,14 @@ function fbconnect_register_page($form, $form_state = array()) {
   if (empty($data)) {
     return facebook_login_page($form, $form_state);
   }
-  // Check if user has allready registered with thier facebook account
+  // Check if user has already registered with thier facebook account
   $uid = _is_fbconnect_user($data['id']);
   if ($uid) {
     // User already registered facebook account to site, log them in
     $form_state['uid'] = $uid;
     user_login_submit($form, $form_state);
   }
-  elseif (_email_allready_exist($data['email'])) {
+  elseif (_email_already_exist($data['email'])) {
     // The user was not found in the fbconnect_users table, but the
     // email from facebook might already have an account.
     // Redirect user to the login page with a message..

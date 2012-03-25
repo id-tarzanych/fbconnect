@@ -288,7 +288,7 @@ function fbconnect_add_user_afterlogin_submit($form, &$form_state) {
         module_load_include('inc', 'fbconnect', 'fbconnect.pages');
         return facebook_login_page($form, $form_state);
     }
-    $uid = _email_allready_exist($data['email']);
+    $uid = _email_already_exist($data['email']);
     if ($uid == $user->uid) {
         //add this user to the fbconnect_users table
         fbconnect_register($user->uid, $data['id']);
@@ -620,7 +620,7 @@ function fbconnect_autoconnect_form_submit($form, &$form_state) {
 
     if (!$uid) {
       if (variable_get('fbconnect_reg_options', 0) == 1) {
-        if ($uid_from_email = _email_allready_exist($data['email'])) {
+        if ($uid_from_email = _email_already_exist($data['email'])) {
           // Connect facebook to the existing account, and login the user.
           fbconnect_register($uid_from_email, $data['id']);
           $form_state['uid'] = $uid_from_email;
@@ -849,10 +849,10 @@ function fbconnect_graph_query($path, $params = array()) {
 }
 
 /**
- * Check the users table to see if the email is allready in the drupal system
+ * Check the users table to see if the email is already in the drupal system
  *  returns uid of user with the email
  */
-function _email_allready_exist($email) {
+function _email_already_exist($email) {
     $query = db_select('users', 'u');
     $query->fields('u', array('uid'));
     $query->condition('mail', $email, '=');
