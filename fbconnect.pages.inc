@@ -402,25 +402,19 @@ function fbconnect_user_settings_form($form, $form_state, $account) {
  */
 function fbconnect_user_settings_form_submit($form, &$form_state) {
   $account = $form_state['values']['account'];
-  //$visible = $form_state['values']['visibility'];
-  $avatar = $form_state['values']['fb_avatar'];
-  $op = $form_state['values']['op'];
-  $fbuid = $account->fbuid;
-
   $data['data']['fb_visible'] = $form_state['values']['fb_visible'];
   $data['data']['fb_avatar'] = $form_state['values']['fb_avatar'];
 
-  if ($op == $form['fbconnect']['unlink']['#value']) {
-    if (fbconnect_unregister($fbuid)) {
-      $data['data']['fb_visible'] = NULL;
-      $data['data']['fb_avatar'] = NULL;
+  if ($form_state['values']['op'] == $form['fbconnect']['unlink']['#value']) {
+    if (fbconnect_unregister($account->fbuid)) {
+      unset($data);
     }
     else {
       form_set_error('fbconnect', t("Something went wrong. Can't unlink account"));
     }
   }
 
-  if ($data) {
+  if (isset($data)) {
     user_save($account, $data);
   }
   drupal_set_message(t('Your configuration options have been saved.'));

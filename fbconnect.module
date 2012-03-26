@@ -713,28 +713,16 @@ function _get_user_fbuid($uid) {
 }
 
 /**
- * Store user into table fbconnect
- *
- * @param Int $uid
- *   Drupal user id
- * @param Int $fbuid
- *   Facebook user id
+ * Stores user into table fbconnect.
  */
 function fbconnect_register($uid, $fbuid) {
-  if (_get_user_fbuid($uid)) {
-    return FALSE;
-  }
-  if (_is_fbconnect_user($fbuid)) {
+  if (_get_user_fbuid($uid) || _is_fbconnect_user($fbuid)) {
     return FALSE;
   }
 
-  db_delete('fbconnect_users')
-    ->condition('uid', $uid)
-    ->execute();
-
-  db_insert('fbconnect_users')
+  db_merge('fbconnect_users')
+    ->key(array('uid' => $uid))
     ->fields(array(
-      'uid' => $uid,
       'fbuid' => $fbuid,
       'timestamp' => REQUEST_TIME,
     ))
@@ -746,22 +734,13 @@ function fbconnect_register($uid, $fbuid) {
   user_save($account, array('fbuid' => $fbuid));
   module_invoke('rules', 'invoke_event', 'fbconnect_user_registered', $account);
 
-  watchdog(
-    'fbconnect',
-    'User has connected his Facebook account (@fbuid)',
-    array('@fbuid' => $fbuid),
-    WATCHDOG_NOTICE,
-    l(t('edit'), "user/$uid/edit/fbconnect")
+  watchdog('fbconnect', 'User has connected his Facebook account (@fbuid)', array('@fbuid' => $fbuid), WATCHDOG_NOTICE, l(t('edit'), "user/$uid/edit/fbconnect")
   );
   return TRUE;
 }
 
 /**
- * Remove user from table fbconnect
- *
- * @param Int $fbuid
- *   Facebook user id
- * @return boolean
+ * Unlink Facebook account from user account.
  */
 function fbconnect_unregister($fbuid) {
   if (!facebook_client()) {
@@ -782,9 +761,7 @@ function fbconnect_unregister($fbuid) {
       }
     }
     catch (Exception $e) {
-      $msg = 'Exception thrown while using fbconnect_unregister: @code';
-      $args = array('@code' => $e->getMessage());
-      watchdog('fbconnect', $msg, $args, WATCHDOG_ERROR);
+      watchdog('fbconnect', 'Exception thrown while using fbconnect_unregister: @code', array('@code' => $e->getMessage()), WATCHDOG_ERROR);
     }
 
     db_delete('fbconnect_users')
@@ -796,13 +773,7 @@ function fbconnect_unregister($fbuid) {
     user_save($account, array('fbuid' => NULL));
     module_invoke('rules', 'invoke_event', 'fbconnect_user_unregistered', $account);
 
-    watchdog(
-      'fbconnect',
-      "Users authorization is revoked (fbuid: @fbuid)",
-      array('@fbuid' => $fbuid),
-      WATCHDOG_NOTICE,
-      l(t('edit'), "user/$uid/edit/fbconnect")
-    );
+    watchdog('fbconnect', 'User authorization is revoked (@fbuid)', array('@fbuid' => $fbuid), WATCHDOG_NOTICE, l(t('edit'), "user/$uid/edit/fbconnect"));
 
     return TRUE;
   }
@@ -876,13 +847,13 @@ function fbconnect_graph_query($path, $params = array()) {
 
 /**
  * Check the users table to see if the email is already in the drupal system
- *  returns uid of user with the email
+ *  returns uid of user with the email.
  */
 function _email_already_exist($email) {
-    $query = db_select('users', 'u');
-    $query->fields('u', array('uid'));
-    $query->condition('mail', $email, '=');
-    return $query->execute()->fetchField();
+  $query = db_select('users', 'u');
+  $query->fields('u', array('uid'));
+  $query->condition('mail', $email, '=');
+  return $query->execute()->fetchField();
 }
 
 /**
