@@ -67,12 +67,12 @@ function fbconnect_api_keys_settings($form, &$form_state) {
     '#default_value' => variable_get('fbconnect_connect_url', $GLOBALS['base_url'] . '/'),
   );
 
-   $form['fbconnect_noroot'] = array(
-     '#title' => t("Don't include settings in footer"),
-     '#type' => 'checkbox',
-     '#description' => t('Check if other facebook modules are in use so fb-root code is not added twice.'),
-     '#default_value' => variable_get('fbconnect_noroot', '')
-   );
+  $form['fbconnect_noroot'] = array(
+    '#title' => t("Don't include settings in footer"),
+    '#type' => 'checkbox',
+    '#description' => t('Check if other facebook modules are in use so fb-root code is not added twice.'),
+    '#default_value' => variable_get('fbconnect_noroot', '')
+  );
 
   //  locale
   //  connect_logo_url

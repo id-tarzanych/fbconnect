@@ -411,7 +411,7 @@ function _facebook_client_load_include() {
       }
     }
     if (!$library['loaded']) {
-      watchdog('fbconnect', t('Unable to load the required Facebook library, please check the README.txt for instructions on how to resolve this.'));
+      watchdog('fbconnect', 'Unable to load the required Facebook library, please check the README.txt for instructions on how to resolve this.');
     }
   }
   return class_exists('Facebook') && defined('Facebook::VERSION');
@@ -450,13 +450,13 @@ function facebook_client() {
  * @return user_profile array
  */
 function fbconnect_user_profile() {
-  $user_profile = null;
+  $user_profile = NULL;
   if (($client = facebook_client()) && ($user = $client->getUser())) {
     try {
       // Proceed knowing you have a logged in user who's authenticated.
       $user_profile = $client->api('/me');
     } catch (FacebookApiException $e) {
-      $user_profile = null;
+      $user_profile = NULL;
     }
   }
   return $user_profile;
@@ -843,8 +843,7 @@ function fbconnect_fql_query($query) {
       }
     }
     catch (Exception $e) {
-      $msg = 'Exception thrown while using fbconnect_fql_query : @code';
-      watchdog('fbconnect', $msg, array('@code' => $e->getMessage()), WATCHDOG_WARNING);
+      watchdog('fbconnect', 'Exception thrown while using fbconnect_fql_query : @code', array('@code' => $e->getMessage()), WATCHDOG_WARNING);
     }
   }
 }
@@ -1072,7 +1071,7 @@ function fbconnect_rdf_namespaces() {
 }
 
 /**
- * Implements hook_user_logout.
+ * Implements hook_user_logout().
  */
 function fbconnect_user_logout() {
   // Redirect user to Facebook logout url.

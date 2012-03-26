@@ -94,7 +94,7 @@ function fbconnect_login_page($form, $form_state = array()) {
     // User already registered facebook account to site, log them in
     $form_state['uid'] = $user_id;
     user_login_submit($form, $form_state);
-    drupal_set_message('You have been successfully logged in.');
+    drupal_set_message(t('You have been successfully logged in.'));
     drupal_goto('user/' . $user_id);
   }
   elseif ( _email_already_exist($data['email'])) {
@@ -107,7 +107,7 @@ function fbconnect_login_page($form, $form_state = array()) {
     drupal_goto('user/login', $options);
   }
   else {
-    drupal_set_message('You do not have an account with this site. Create an account on this site with through facebook !here', array('!here' => l('fbconnect/register/create')));
+    drupal_set_message(t('You do not have an account with this site. Create an account on this site with through Facebook <a href="!here">here</a>'), array('!here' => url('fbconnect/register/create')));
   }
 
 }
@@ -195,11 +195,11 @@ function fbconnect_register_page($form, $form_state = array()) {
     //to make validation work have to unset some form fields and settings Taxonomy fields cause errors
     //TODO:: check this code sure it will need to check for required profile fields and fill them with data
     foreach ($form as $key => $val) {
-        //unset all cusom fields
-        if (strstr($key, 'field_')) {
-            //unset this custom field
-            unset($form[$key]);
-        }
+      //unset all cusom fields
+      if (strstr($key, 'field_')) {
+        //unset this custom field
+        unset($form[$key]);
+      }
     }
     $form_state['complete form'] = $form;
     //taxonomy linked fields causes issues with this validate form function
@@ -257,14 +257,14 @@ function _fbconnect_get_username($name_suggestion) {
 
 function fbconnect_register_form_validate($form, &$form_state) {
   $fbuid = fbconnect_get_fbuid();
-  //make sure we have a facebook user object by the time we get here otherwise drop form and exit with error message
+  // Make sure we have a facebook user object by the time we get here otherwise
+  // drop form and exit with error message.
   if ($fbuid == 0) {
-    $msg = t('You are not logged into facebook log into facebook and try again.');
-    drupal_set_message($msg, 'error');
-    watchdog('fbconnect', $msg);
+    drupal_set_message(t('You are not logged into Facebook. Log into Facebook and try again.'), 'error');
     drupal_goto();
   }
 }
+
 function fbconnect_register_form_submit($form, &$form_state) {
   $fbuid = fbconnect_get_fbuid();
   if (_is_fbconnect_user($fbuid)) {
