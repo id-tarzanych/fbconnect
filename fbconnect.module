@@ -471,6 +471,15 @@ function fbconnect_get_config() {
   static $config;
 
   if (!$config) {
+    if (module_exists('i18n')) {
+      global $language;
+      $switch_code = variable_get('fbconnect_language_code_' . $language->language, '');
+
+      if ($switch_code) {
+        $config['language_code'] = $switch_code;
+      }
+    }
+
     $config['user_pictures'] = variable_get('fbconnect_pic_allow', 'allow');
     $config['language_code'] = variable_get('fbconnect_language_code', 'en_US');
 
@@ -482,15 +491,6 @@ function fbconnect_get_config() {
     }
     else {
       $config['connect_js'] = "document.location.protocol + '//connect.facebook.net/$config[language_code]/all.js'";
-    }
-
-    if (module_exists('i18n')) {
-      global $language;
-      $switch_code = variable_get('fbconnect_language_code_' . $language->language, '');
-
-      if ($switch_code) {
-        $config['language_code'] = $switch_code;
-      }
     }
 
     $config['loginout_mode'] = variable_get('fbconnect_loginout_mode', 'manual');
