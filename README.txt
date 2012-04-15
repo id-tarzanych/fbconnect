@@ -43,9 +43,9 @@ Facebook API key: http://www.facebook.com/developers/
 
   3. Create a new facebook application: http://www.facebook.com/developers/createapp.php
 
-  4. Enter the Site URL on Web Site settings tab (e.g. copy value from admin/settings/fbconnect field “Connect url”).
+  4. Enter the Site URL on Web Site settings tab (e.g. copy value from admin/config/people/fbconnect field “Connect url”).
 
-  5. Configure the module through admin interface (admin/settings/fbconnect) using the information provided by Facebook
+  5. Configure the module through admin interface (admin/config/people/fbconnect) using the information provided by Facebook
     (Application ID, Application Secret).
 
 -- About "Connecting" with Facebook --
@@ -91,7 +91,7 @@ If you select "manual" there are two options for the name of the button.
 -- FAQ --
 
 Q: How to skip linking local account to FB account?
-A: Enable "Disable linking accounts during registration" checkbox on admin/settings/fbconnect/apperance page
+A: Enable "Disable linking accounts during registration" checkbox on admin/config/people/fbconnect/apperance page
 
 Q: Why the connect button does not appear?
 Q: Facebook Connect dialog says: "Invalid Argument: Given URL is not allowed by the Application configuration".
@@ -102,7 +102,7 @@ Q: I'm getting error "Application Unavailable - The application you are trying t
 A: Try to disable all other facebook* modules. If you're using fb_social you have to enable fbconnect_fb_social.
 
 Q: Cannot login to drupal site after sucessully logged in to facebook.
-A: Check your Application Secret on admin/settings/fbconnect page.
+A: Check your Application Secret on admin/config/people/fbconnect page.
 
 Q: Fbconnect Causes W3C XHTML Validation To Fail
 A: http://drupal.org/node/365584#comment-3539890
