@@ -21,10 +21,6 @@ api = 2
 
 projects[drupal][version] = 7
 
-projects[fbconnect][version] = 2.x-dev
-projects[fbconnect][type] = module
-projects[fbconnect][subdir] = contrib
-
 projects[libraries][version] = 2.0-alpha2
 projects[libraries][type] = module
 projects[libraries][subdir] = contrib
