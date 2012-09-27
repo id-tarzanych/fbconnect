@@ -304,14 +304,14 @@ function fbconnect_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Add the user to the fbconnect_users table if they logged in with facebook
+ * Add the user to the fbconnect_users table if they logged in with Facebook
  * @param mixed $form
  * @param mixed $form_state
  */
 function fbconnect_add_user_afterlogin_submit($form, &$form_state) {
     global $user;
     $data = fbconnect_get_user_info(array('name', 'email'));
-    //user not logged into facebook we dont have any information for them, let them log in again
+    //user not logged into Facebook we dont have any information for them, let them log in again
     if (empty($data)) {
         module_load_include('inc', 'fbconnect', 'fbconnect.pages');
         return facebook_login_page($form, $form_state);
@@ -418,7 +418,7 @@ function _facebook_client_load_include() {
 }
 
 /**
- * Get the facebook client object for easy access.
+ * Get the Facebook client object for easy access.
  * @return Facebook
  *   Facebook Api object
  */
@@ -508,13 +508,13 @@ function fbconnect_get_config() {
 }
 
 /**
- * Check facebook session.
+ * Check Facebook session.
  *
  * @param boolean $check_connected
- *   ensure that active user is connected with active facebook account
+ *   ensure that active user is connected with active Facebook account
  *
  * @return integer
- *   facebook user id
+ *   Facebook user id
  */
 function fbconnect_get_fbuid($check_connected = FALSE) {
   global $user;
@@ -600,7 +600,7 @@ function fbconnect_page_alter(&$page) {
 }
 
 /**
- * This form is submitted by javascript when facebook session is detected.
+ * This form is submitted by javascript when Facebook session is detected.
  */
 function fbconnect_autoconnect_form($form) {
   $form['#id'] = 'fbconnect-autoconnect-form';
@@ -630,7 +630,7 @@ function fbconnect_autoconnect_form($form) {
 function fbconnect_autoconnect_form_submit($form, &$form_state) {
   $fbuid = fbconnect_get_fbuid();
   if (!$fbuid) {
-    $error_msg = 'fbconnect_autoconnect_form_submit has been called without valid facebook session. Check your Application Secret on fbconnect settings page';
+    $error_msg = 'fbconnect_autoconnect_form_submit has been called without valid Facebook session. Check your Application Secret on fbconnect settings page';
 
     watchdog('fbconnect', $error_msg, array(), WATCHDOG_ALERT, l(t('configure'), 'admin/config/people/fbconnect'));
     return;
@@ -648,7 +648,7 @@ function fbconnect_autoconnect_form_submit($form, &$form_state) {
     if (!$uid) {
       if (variable_get('fbconnect_reg_options', 0) == 1) {
         if ($uid_from_email = _email_already_exist($data['email'])) {
-          // Connect facebook to the existing account, and login the user.
+          // Connect Facebook to the existing account, and login the user.
           fbconnect_register($uid_from_email, $data['id']);
           $form_state['uid'] = $uid_from_email;
           user_login_submit($form, $form_state);
@@ -857,7 +857,7 @@ function _email_already_exist($email) {
 }
 
 /**
- * Query information from facebook user table.
+ * Query information from Facebook user table.
  *
  * @return array
  */
@@ -881,7 +881,7 @@ function fbconnect_get_user_info($fields = array(), $fbuid = NULL) {
 }
 
 /**
- * Query information from facebook user table.
+ * Query information from Facebook user table.
  *
  * @deprecated
  * @see fbconnect_get_user_info()

@@ -7,7 +7,7 @@
 
 /**
  * Menu callback.
- * Called when user perform facebook registration
+ * Called when user perform Facebook registration
  */
 function fbconnect_prompt_page() {
   $conf = fbconnect_get_config();
@@ -84,21 +84,21 @@ function fbconnect_prompt_page_links() {
 function fbconnect_login_page($form, $form_state = array()) {
   $conf = fbconnect_get_config();
   $data = fbconnect_get_user_info(array('name', 'email'));
-  // User not logged into facebook we dont have any information for them, let them log in.
+  // User not logged into Facebook we dont have any information for them, let them log in.
   if (empty($data)) {
       return facebook_login_page($form, $form_state);
   }
-  // Check if user has already registered with their facebook account.
+  // Check if user has already registered with their Facebook account.
   $user_id = _is_fbconnect_user($data['id']);
   if ($user_id) {
-    // User already registered facebook account to site, log them in
+    // User already registered Facebook account to site, log them in
     $form_state['uid'] = $user_id;
     user_login_submit($form, $form_state);
     drupal_set_message(t('You have been successfully logged in.'));
     drupal_goto('user/' . $user_id);
   }
   elseif ( _email_already_exist($data['email'])) {
-    // The user was not found in the fbconnect_users table, but the emial from facebook might already have an account on coracle.
+    // The user was not found in the fbconnect_users table, but the emial from Facebook might already have an account on coracle.
     // Redirect user to the login page with a message.
     drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
     $options = array('query' => array(
@@ -114,25 +114,25 @@ function fbconnect_login_page($form, $form_state = array()) {
 
 /**
  * Menu callback.
- * Called when user perform facebook registration
+ * Called when user perform Facebook registration
  */
 function fbconnect_register_page($form, $form_state = array()) {
   $conf = fbconnect_get_config();
   $data = fbconnect_get_user_info(array('name', 'email'));
-  // User not logged into facebook we dont have any information for them, let them log in.
+  // User not logged into Facebook we dont have any information for them, let them log in.
   if (empty($data)) {
     return facebook_login_page($form, $form_state);
   }
-  // Check if user has already registered with thier facebook account
+  // Check if user has already registered with thier Facebook account
   $uid = _is_fbconnect_user($data['id']);
   if ($uid) {
-    // User already registered facebook account to site, log them in
+    // User already registered Facebook account to site, log them in
     $form_state['uid'] = $uid;
     user_login_submit($form, $form_state);
   }
   elseif (_email_already_exist($data['email'])) {
     // The user was not found in the fbconnect_users table, but the
-    // email from facebook might already have an account.
+    // email from Facebook might already have an account.
     // Redirect user to the login page with a message..
     drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
     $options = array('query' => array(
@@ -172,7 +172,7 @@ function fbconnect_register_page($form, $form_state = array()) {
     $form['fbconnect']['fb_avatar'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use my Facebook picture as user picture'),
-      '#description' => t('Your picture will be loaded from facebook.'),
+      '#description' => t('Your picture will be loaded from Facebook.'),
       '#default_value' => 1,
     );
   }
@@ -230,7 +230,7 @@ function facebook_login_page(&$form, $form_state = array()) {
     $login_url = $facebook->getLoginUrl($params);
     $form['log_in_to_facebook'] = array(
       '#title' => t('You must login to Facebook AND give the site access to use this feature'),
-      '#description' => t('Log in using your facebook account'),
+      '#description' => t('Log in using your Facebook account'),
       '#type' => 'item',
       '#markup' => l(t('Login using your Facebook account'), $login_url),
     );
@@ -257,7 +257,7 @@ function _fbconnect_get_username($name_suggestion) {
 
 function fbconnect_register_form_validate($form, &$form_state) {
   $fbuid = fbconnect_get_fbuid();
-  // Make sure we have a facebook user object by the time we get here otherwise
+  // Make sure we have a Facebook user object by the time we get here otherwise
   // drop form and exit with error message.
   if ($fbuid == 0) {
     drupal_set_message(t('You are not logged into Facebook. Log into Facebook and try again.'), 'error');
@@ -313,7 +313,7 @@ function fbconnect_user_identities($form_id, $account) {
     $account->fbuid = $fbuid;
   }
   if (!$uid && !empty($current_fbuid)) {
-    // We have facebook access for this user but we dont have the user in the fbconnect_users table, add him.
+    // We have Facebook access for this user but we dont have the user in the fbconnect_users table, add him.
     fbconnect_register($account->uid, $current_fbuid);
     $uid = _is_fbconnect_user($current_fbuid);
   }
@@ -329,14 +329,14 @@ function fbconnect_user_identities($form_id, $account) {
 }
 
 /**
- *  This form allows the user to manage their facebook connect settings.
+ *  This form allows the user to manage their Facebook connect settings.
  *
- *  Some options are visible only if facebook session is active.
+ *  Some options are visible only if Facebook session is active.
  */
 function fbconnect_user_settings_form($form, $form_state, $account) {
   $conf = fbconnect_get_config();
   // These fields manage the visibility of the user,
-  // if the option is enabled, user's facebook friends
+  // if the option is enabled, user's Facebook friends
   // will be able to see his presence on this site
   $form['fb_visible'] = array(
     '#type' => 'checkbox',
@@ -346,12 +346,12 @@ function fbconnect_user_settings_form($form, $form_state, $account) {
   );
 
   // Whether user picture is enabled,
-  // users can choose to use his facebook avatar as avatar
+  // users can choose to use his Facebook avatar as avatar
   if ($conf['user_pictures'] == 'allow') {
     $form['fb_avatar'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use my Facebook picture as user picture'),
-      '#description' => t('Your picture will be loaded from facebook.'),
+      '#description' => t('Your picture will be loaded from Facebook.'),
       '#default_value' => isset($account->data['fb_avatar']) ? $account->data['fb_avatar'] : NULL,
     );
   }
@@ -421,7 +421,7 @@ function fbconnect_user_settings_form_submit($form, &$form_state) {
 }
 
 /**
- * Make rendering of facebook user picture themeable
+ * Make rendering of Facebook user picture themeable
  */
 function theme_fbconnect_user_picture_override($variables) {
   $fbuid = $variables['fbuid'];
@@ -436,7 +436,7 @@ function theme_fbconnect_user_picture_override($variables) {
 
 
 /**
- * Make rendering of facebook user profile tab themable
+ * Make rendering of Facebook user profile tab themable
  */
 function theme_fbconnect_user_profile_tab_connected($variables) {
   $account = $variables['account'];

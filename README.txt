@@ -41,7 +41,7 @@ Facebook API key: http://www.facebook.com/developers/
      libraries[facebook-php-sdk][download][url] = "http://github.com/facebook/php-sdk/tarball/v3.1.1"
      libraries[facebook-php-sdk][destination] = "libraries"
 
-  3. Create a new facebook application: http://www.facebook.com/developers/createapp.php
+  3. Create a new Facebook application: http://www.facebook.com/developers/createapp.php
 
   4. Enter the Site URL on Web Site settings tab (e.g. copy value from admin/config/people/fbconnect field “Connect url”).
 
@@ -101,7 +101,7 @@ Q: Fbconnect redirects to the Facebook homepage in popup
 Q: I'm getting error "Application Unavailable - The application you are trying to access is unavailable or restricted"
 A: Try to disable all other facebook* modules. If you're using fb_social you have to enable fbconnect_fb_social.
 
-Q: Cannot login to drupal site after sucessully logged in to facebook.
+Q: Cannot login to drupal site after sucessully logged in to Facebook.
 A: Check your Application Secret on admin/config/people/fbconnect page.
 
 Q: Fbconnect Causes W3C XHTML Validation To Fail
