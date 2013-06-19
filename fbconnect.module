@@ -933,12 +933,14 @@ function fbconnect_theme_user_picture_override($variables) {
   if (!isset($account->fbuid)) {
     $user_data = unserialize(db_query('SELECT data FROM {users} WHERE uid = :uid', array(':uid' => $account->uid))->fetchField());
     if (isset($user_data['fbuid'])) {
-        $account->fbuid = @$user_data['fbuid'];
+      $account->fbuid = @$user_data['fbuid'];
     }
     else {
-        $account->fbuid = _get_user_fbuid($account->uid);
+      $account->fbuid = _get_user_fbuid($account->uid);
     }
-    $account->data['fb_avatar'] = @$user_data['fb_avatar'];
+    if (isset($user_data['fb_avatar']) && isset($account->data)) {
+      $account->data['fb_avatar'] = @$user_data['fb_avatar'];
+    }
   }
 
   // First learn the Facebook id
