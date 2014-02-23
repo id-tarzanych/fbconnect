@@ -170,6 +170,7 @@ FBML;
  */
 function fbconnect_get_connected_friends($fbuid) {
   $fbid=array();
+  $rows=array();
   if (facebook_client()) {
     $query = "SELECT uid, has_added_app FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = $fbuid)";
     try {

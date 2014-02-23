@@ -563,7 +563,9 @@ function fbconnect_render_js() {
 function fbconnect_page_alter(&$page) {
   if (facebook_client() && !_fbconnect_is_excluded_page($_GET['q']) && !variable_get('fbconnect_noroot')) {
     $config = fbconnect_get_config();
+	$invite_msg = check_plain(variable_get('fbconnect_invite_msg', t('Enjoy!')));
     $channel_uri = preg_replace("@'@msi", "\'", "http://" . $_SERVER['HTTP_HOST'] . "/" . drupal_get_path('module', 'fbconnect') . "/channel.html");
+    $invite_code = (arg(0) == "fbconnect" && arg(1) == "invite" && arg(2) == "friends") ? 'FB.ui({method: "apprequests", message: "'.$invite_msg.'"}, function() {});' : "";
     $page['page_bottom']['fb-init-code'] = array(
       '#type' => 'markup',
       '#markup' => '<div id="fb-root"></div>
@@ -575,7 +577,8 @@ function fbconnect_page_alter(&$page) {
             xfbml : true,
             logging: \'' . $config['debug'] . '\',
             channelURL: \'' . $channel_uri . '\',
-            oauth  : true
+            oauth  : true,
+            frictionlessRequests: true
           });
           // whenever the user logs in, we tell our login service
           FB.Event.subscribe(\'auth.login\', function() {
@@ -584,10 +587,9 @@ function fbconnect_page_alter(&$page) {
           FB.Event.subscribe(\'auth.logout\', function(response) {
             window.location.reload();
           });
-
+                    ' . $invite_code . '
           jQuery(document).trigger(\'fb:init\');
         };
-
         (function() {
           var e = document.createElement(\'script\');
           e.src = ' . $config['connect_js'] . ';
