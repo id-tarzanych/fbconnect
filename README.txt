@@ -22,7 +22,7 @@ Also this tab allows to unlink your Facebook account.
 -- REQUIREMENTS --
 PHP 5.2 or higher versions.
 Drupal 7.x.
-Facebook PHP 3.x Library or higher: http://github.com/facebook/php-sdk/ (OAuth 2.0 Support Now)
+Facebook PHP 3.x Library or higher: https://github.com/facebook/facebook-php-sdk (OAuth 2.0 Support Now)
 Facebook API key: http://www.facebook.com/developers/
 
 
@@ -30,7 +30,7 @@ Facebook API key: http://www.facebook.com/developers/
   1. Upload the 'fbconnect' folder into your module directory and activate
      the modules.
 
-  2. Upload facebook-php-sdk library (http://github.com/facebook/php-sdk/) into the libraries
+  2. Upload facebook-php-sdk library (https://github.com/facebook/facebook-php-sdk) into the libraries
      folder so that it looks like 'sites/all/libraries/facebook-php-sdk/src/facebook.php'.
 
  -- OR --
@@ -38,7 +38,7 @@ Facebook API key: http://www.facebook.com/developers/
 
      projects[] = fbconnect
      libraries[facebook-php-sdk][download][type] = "get"
-     libraries[facebook-php-sdk][download][url] = "http://github.com/facebook/php-sdk/tarball/v3.1.1"
+     libraries[facebook-php-sdk][download][url] = "https://github.com/facebook/facebook-php-sdk/releases"
      libraries[facebook-php-sdk][destination] = "libraries"
 
   3. Create a new Facebook application: http://www.facebook.com/developers/createapp.php
