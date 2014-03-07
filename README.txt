@@ -41,7 +41,7 @@ Facebook API key: http://www.facebook.com/developers/
      libraries[facebook-php-sdk][download][url] = "https://github.com/facebook/facebook-php-sdk/releases"
      libraries[facebook-php-sdk][destination] = "libraries"
 
-  3. Create a new Facebook application: http://www.facebook.com/developers/createapp.php
+  3. Create a new Facebook application: https://developers.facebook.com/apps
 
   4. Enter the Site URL on Web Site settings tab (e.g. copy value from admin/config/people/fbconnect field “Connect url”).
 
