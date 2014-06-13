@@ -30,6 +30,6 @@ projects[libraries][subdir] = contrib
 ; ------------
 
 libraries[facebook-php-sdk][download][type] = "get"
-libraries[facebook-php-sdk][download][url] = "http://github.com/facebook/php-sdk/tarball/v3.1.1"
+libraries[facebook-php-sdk][download][url] = "http://github.com/facebook/facebook-php-sdk/archive/v3.1.1.tar.gz"
 libraries[facebook-php-sdk][destination] = "libraries"
 
