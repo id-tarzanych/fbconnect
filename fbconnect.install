@@ -30,28 +30,20 @@ function fbconnect_requirements($phase) {
     drupal_load('module', 'fbconnect');
     _facebook_client_load_include();
 
-    $requirements['facebook-php-sdk']['title'] = $t('Facebook PHP sdk');
-    if (!class_exists('Facebook')) {
-      $requirements['facebook-php-sdk']['value'] = $t('Not installed');
-      $requirements['facebook-php-sdk']['severity'] = REQUIREMENT_ERROR;
-      $requirements['facebook-php-sdk']['description'] = $t('Fbconnect : Facebook PHP library not found. See README.txt');
+    $requirements['facebook-php-sdk-v4']['title'] = $t('Facebook PHP sdk v4.1');
+    if (!class_exists('Facebook\Facebook')) {
+      $requirements['facebook-php-sdk-v4']['value'] = $t('Not installed');
+      $requirements['facebook-php-sdk-v4']['severity'] = REQUIREMENT_ERROR;
+      $requirements['facebook-php-sdk-v4']['description'] = $t('Fbconnect : Facebook PHP library not found. See README.txt');
     }
-    elseif (!constant('Facebook::VERSION')) {
-      $requirements['facebook-php-sdk']['value'] = $t('Outdated version');
-      $requirements['facebook-php-sdk']['severity'] = REQUIREMENT_ERROR;
-      $requirements['facebook-php-sdk']['description'] = $t('Fbconnect : Installed Facebook PHP library is outdated. See README.txt');
+    elseif (!constant('Facebook\Facebook::VERSION')) {
+      $requirements['facebook-php-sdk-v4']['value'] = $t('Outdated version');
+      $requirements['facebook-php-sdk-v4']['severity'] = REQUIREMENT_ERROR;
+      $requirements['facebook-php-sdk-v4']['description'] = $t('Fbconnect : Installed Facebook PHP library is outdated. See README.txt');
     }
     else {
-      $requirements['facebook-php-sdk']['value'] = l(constant('Facebook::VERSION'), 'http://github.com/facebook/php-sdk', array('external' => TRUE));
-      $requirements['facebook-php-sdk']['severity'] = REQUIREMENT_OK;
-
-      //      $sdk_include_path_1 = drupal_get_path('module', 'fbconnect') .'/facebook-php-sdk/src/facebook.php';
-      //      $sdk_include_path_2 = module_invoke('libraries', 'get_path', 'facebook-php-sdk') .'/src/facebook.php';
-      //
-      //      if (!file_exists($sdk_include_path_1) || !file_exists($sdk_include_path_2)) {
-      //        $requirements['facebook-php-sdk']['severity'] = REQUIREMENT_WARNING;
-      //        $requirements['facebook-php-sdk']['value'] .= ' '. $t('You installed Facebook PHP sdk in deprecated path. See README.txt');
-      //      }
+      $requirements['facebook-php-sdk-v4']['value'] = l(constant('Facebook\Facebook::VERSION'), 'http://github.com/facebook/facebook-php-sdk-v4', array('external' => TRUE));
+      $requirements['facebook-php-sdk-v4']['severity'] = REQUIREMENT_OK;
     }
 
     if (!fbconnect_get_config()) {

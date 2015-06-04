@@ -20,9 +20,9 @@ If this parameter is enabled, the user's will be visible by her Facebook friends
 Also this tab allows to unlink your Facebook account.
 
 -- REQUIREMENTS --
-PHP 5.2 or higher versions.
+PHP 5.4 or higher versions.
 Drupal 7.x.
-Facebook PHP 3.x Library or higher: https://github.com/facebook/facebook-php-sdk (OAuth 2.0 Support Now)
+Facebook PHP 4.1.0 Library or higher: https://github.com/facebook/facebook-php-sdk-v4
 Facebook API key: http://www.facebook.com/developers/
 
 
@@ -30,16 +30,10 @@ Facebook API key: http://www.facebook.com/developers/
   1. Upload the 'fbconnect' folder into your module directory and activate
      the modules.
 
-  2. Upload facebook-php-sdk library (https://github.com/facebook/facebook-php-sdk) into the libraries
-     folder so that it looks like 'sites/all/libraries/facebook-php-sdk/src/facebook.php'.
+  2. Upload facebook-php-sdk-v4 library (https://github.com/facebook/facebook-php-sdk-v4) into the libraries
+     folder so that it looks like 'sites/all/libraries/facebook-php-sdk-v4'.
 
- -- OR --
-  Use drush_make script instead of steps 1 and 2:
-
-     projects[] = fbconnect
-     libraries[facebook-php-sdk][download][type] = "get"
-     libraries[facebook-php-sdk][download][url] = "https://github.com/facebook/facebook-php-sdk/releases"
-     libraries[facebook-php-sdk][destination] = "libraries"
+     drush_make script will come back right after Facebook PHP SDK v4.1.0 stable release
 
   3. Create a new Facebook application: https://developers.facebook.com/apps
 

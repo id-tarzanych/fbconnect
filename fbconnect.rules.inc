@@ -16,7 +16,7 @@ function fbconnect_rules_event_info() {
     'fbconnect_user_registered' => array(
       'label' => t('User has connected his Facebook Account'),
       'module' => 'fbconnect',
-      'arguments' => array(
+      'variables' => array(
         'account' => array(
           'type' => 'user',
           'label' => t('granted facebook auth user'),
@@ -26,7 +26,7 @@ function fbconnect_rules_event_info() {
     'fbconnect_user_unregistered' => array(
       'label' => t('User has disconnected his Facebook Account'),
       'module' => 'fbconnect',
-      'arguments' => array(
+      'variables' => array(
         'account' => array(
           'type' => 'user',
           'label' => t('revoked facebook auth user'),
@@ -36,7 +36,7 @@ function fbconnect_rules_event_info() {
     'fbconnect_user_login' => array(
       'label' => t('User has logged in via Facebook'),
       'module' => 'fbconnect',
-      'arguments' => array(
+      'variables' => array(
         'account' => array(
           'type' => 'user',
           'label' => t('logged in via facebook user'),

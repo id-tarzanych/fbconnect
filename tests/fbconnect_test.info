@@ -1,2 +1,4 @@
 name = FBConnect Test
 dependencies[] = fbconnect
+core = 7.x
+hidden = TRUE

@@ -98,7 +98,6 @@ Drupal.fbconnect.DoFastRegistration =  function(link) {
   }, {scope:'email'});
 };
 
-
 function facebook_onlogin_ready() {
   // http://github.com/facebook/connect-js/issues/194
   if (!FB.getAuthResponse()) {

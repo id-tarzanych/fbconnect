@@ -5,6 +5,9 @@
  * User pages callbacks for the fbconnect module.
  */
 
+use Facebook\Helpers\FacebookRedirectLoginHelper;
+use Facebook\PersistentData\FacebookMemoryPersistentDataHandler;
+
 /**
  * Menu callback.
  * Called when user perform Facebook registration
@@ -19,62 +22,21 @@ function fbconnect_prompt_page() {
 
   $reg_attr = array();
   if ($conf['fast_reg_mode']) {
-    $reg_attr = array('attributes' => array(
-      'onclick' => 'Drupal.fbconnect.DoFastRegistration(this); return false;'
-    ));
+    $reg_attr = array(
+      'attributes' => array(
+        'onclick' => 'Drupal.fbconnect.DoFastRegistration(this); return false;'
+      )
+    );
   }
-  $items = array('items' => array(l($reg_msg, 'fbconnect/register/create', $reg_attr), l($link_msg, 'user', array('query' => array('destination' => 'fbconnect/link')))));
-  /*
-  $links = array(
-    array(
-      'title' => $reg_msg,
-      'href' => 'fbconnect/register/create',
-      $reg_attr,
-    ),
-    array(
-      'title' => $link_msg,
-      'href' => 'user',
-      array('attributes' => array('query' => 'destination=fbconnect/link')),
-    ),
+  $items = array(
+    'items' => array(
+      l($reg_msg, 'fbconnect/register/create', $reg_attr),
+      l($link_msg, 'user', array('query' => array('destination' => 'fbconnect/link')))
+    )
   );
-  */
 
-  //return /*theme('links', array('links' => fbconnect_prompt_page_links))*/
   return theme('item_list', $items);
 }
-
-/*
-function fbconnect_prompt_page_links() {
-  $conf = fbconnect_get_config();
-  $params = array(
-    '!site_name' => $conf['invite_name'],
-  );
-  $reg_msg = t('Click here to create a new !site_name account with Facebook', $params);
-  $link_msg = t('Click here to connect your existing !site_name account with Facebook', $params);
-
-  $reg_attr = array();
-  if ($conf['fast_reg_mode']) {
-    $reg_attr = array('attributes' => array(
-      'onclick' => 'Drupal.fbconnect.DoFastRegistration(this); return false;'
-    ));
-  }
-
-  $links = array(
-    array(
-      'title' => $reg_msg,
-      'href' => 'fbconnect/register/create',
-      $reg_attr,
-    ),
-    array(
-      'title' => $link_msg,
-      'href' => 'user',
-      array('attributes' => array('query' => 'destination=fbconnect/link')),
-    ),
-  );
-
-  return $links;
-}
-*/
 
 
 /**
@@ -82,11 +44,10 @@ function fbconnect_prompt_page_links() {
  * Logs user into site or redirects.
  */
 function fbconnect_login_page($form, $form_state = array()) {
-  $conf = fbconnect_get_config();
   $data = fbconnect_get_user_info(array('name', 'email'));
   // User not logged into Facebook we dont have any information for them, let them log in.
   if (empty($data)) {
-      return facebook_login_page($form, $form_state);
+    return facebook_login_page($form, $form_state);
   }
   // Check if user has already registered with their Facebook account.
   $user_id = _is_fbconnect_user($data['id']);
@@ -95,15 +56,22 @@ function fbconnect_login_page($form, $form_state = array()) {
     $form_state['uid'] = $user_id;
     user_login_submit($form, $form_state);
     drupal_set_message(t('You have been successfully logged in.'));
-    drupal_goto('user/' . $user_id);
+    if (!empty($_GET['destination'])) {
+      drupal_goto($_GET['destination']);
+    } else {
+      drupal_goto('<front>');
+    }
+
   }
-  elseif ( _email_already_exist($data['email'])) {
+  elseif (_email_already_exist($data['email'])) {
     // The user was not found in the fbconnect_users table, but the emial from Facebook might already have an account on coracle.
     // Redirect user to the login page with a message.
     drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
-    $options = array('query' => array(
-      'fbconnect' => 'true'
-    ));
+    $options = array(
+      'query' => array(
+        'fbconnect' => 'true'
+      )
+    );
     drupal_goto('user/login', $options);
   }
   else {
@@ -119,25 +87,28 @@ function fbconnect_login_page($form, $form_state = array()) {
 function fbconnect_register_page($form, $form_state = array()) {
   $conf = fbconnect_get_config();
   $data = fbconnect_get_user_info(array('name', 'email'));
-  // User not logged into Facebook we dont have any information for them, let them log in.
-  if (empty($data)) {
-    return facebook_login_page($form, $form_state);
-  }
   // Check if user has already registered with thier Facebook account
   $uid = _is_fbconnect_user($data['id']);
   if ($uid) {
     // User already registered Facebook account to site, log them in
     $form_state['uid'] = $uid;
     user_login_submit($form, $form_state);
+    if (!empty($_GET['fb-destination'])) {
+      drupal_goto($_GET['fb-destination']);
+    } else {
+      drupal_goto('<front>');
+    }
   }
-  elseif (_email_already_exist($data['email'])) {
+  elseif (!empty($data['email']) && _email_already_exist($data['email']) && user_is_anonymous()) {
     // The user was not found in the fbconnect_users table, but the
     // email from Facebook might already have an account.
     // Redirect user to the login page with a message..
     drupal_set_message(t('This email address is already registered to an account. Please log in to this account with the username and password provided during registration'));
-    $options = array('query' => array(
-      'fbconnect' => 'true'
-    ));
+    $options = array(
+      'query' => array(
+        'fbconnect' => 'true'
+      )
+    );
     drupal_goto('user/login', $options);
     return;
   }
@@ -153,9 +124,15 @@ function fbconnect_register_page($form, $form_state = array()) {
   }
 
   $form['account']['name']['#value'] = empty($form_state['input']['name']) ? $data['name'] : $form_state['input']['name'];
-  $form['account']['mail']['#parents'] = array('name');
-  $form['account']['mail']['#value'] = $data['email'];
-  $form['account']['mail']['#parents'] = array('mail');
+  $form['account']['name']['#parents'] = array('name');
+  if (!empty($data['mail'])) {
+    $form['account']['mail']['#value'] = $data['email'];
+    $form['account']['mail']['#parents'] = array('mail');
+  }
+  else {
+    $form['account']['mail']['#value'] = $data['id'] . '@facebook.com';
+    $form['account']['mail']['#parents'] = array('mail');
+  }
 
   $form['fbconnect'] = array(
     '#type' => 'fieldset',
@@ -183,7 +160,7 @@ function fbconnect_register_page($form, $form_state = array()) {
 
   // Fast registration mode, we by pass std drupal reg form.
   if ($conf['fast_reg_mode']) {
-    $newname = $conf['fast_reg_autoname']? _fbconnect_get_username($data['name']) : $data['name'];
+    $newname = $conf['fast_reg_autoname'] ? _fbconnect_get_username($data['name']) : $data['name'];
     //drupal_set_message('new name : ' . $newname);
     $form_state['values']['name'] = $newname;
     $form_state['values']['mail'] = $data['email'];
@@ -225,16 +202,19 @@ function fbconnect_register_page($form, $form_state = array()) {
 }
 
 function facebook_login_page(&$form, $form_state = array()) {
-    $facebook = facebook_client();
-    $params['scope'] = 'email';
-    $login_url = $facebook->getLoginUrl($params);
-    $form['log_in_to_facebook'] = array(
-      '#title' => t('You must login to Facebook AND give the site access to use this feature'),
-      '#description' => t('Log in using your Facebook account'),
-      '#type' => 'item',
-      '#markup' => l(t('Login using your Facebook account'), $login_url),
-    );
-    return $form;
+  $params['scope'] = 'email';
+  $http_params = drupal_get_query_parameters();
+  $options = array(
+    'absolute' => TRUE,
+    'query' => array('token' => $http_params['token']),
+  );
+  if (module_exists('securepages') && securepages_match('fbconnect/register/create')) {
+    $options['https'] = TRUE;
+  }
+
+  $redirect_uri = url('fbconnect/register/create', $options);
+
+  drupal_goto($redirect_uri);
 }
 
 /**
@@ -321,10 +301,18 @@ function fbconnect_user_identities($form_id, $account) {
     return drupal_get_form('fbconnect_user_settings_form', $account);
   }
   elseif ($uid && $account->uid != $uid) {
-    return theme('fbconnect_user_profile_tab_connected', array('account' => $account, 'conf' => $conf, 'uid' => $uid));
+    return theme('fbconnect_user_profile_tab_connected', array(
+      'account' => $account,
+      'conf' => $conf,
+      'uid' => $uid
+    ));
   }
   else {
-    return theme('fbconnect_user_profile_tab_unconnected', array('account' => $account, 'conf' => $conf, 'uid' => $uid));
+    return theme('fbconnect_user_profile_tab_unconnected', array(
+      'account' => $account,
+      'conf' => $conf,
+      'uid' => $uid
+    ));
   }
 }
 
@@ -387,7 +375,8 @@ function fbconnect_user_settings_form($form, $form_state, $account) {
     '#type' => 'submit',
     '#description' => t('Click here to unlink this Facebook account'),
     '#value' => t('Unlink'),
-    '#access' => !!facebook_client(), // don't show unlink button if fbconnect is'nt properly configured
+    '#access' => !!facebook_client(),
+    // don't show unlink button if fbconnect is'nt properly configured
   );
 
   $form['submit'] = array(
@@ -451,10 +440,10 @@ function theme_fbconnect_user_profile_tab_unconnected($variables) {
   $conf = $variables['conf'];
   $uid = $variables['uid'];
   return '<div>'
-    . t('Click here to connect your Facebook account')
-    . '</div><div class="fbconnect-button">'
-    . fbconnect_render_button()
-    . '</div>';
+  . t('Click here to connect your Facebook account')
+  . '</div><div class="fbconnect-button">'
+  . fbconnect_render_button()
+  . '</div>';
 }
 
 /**

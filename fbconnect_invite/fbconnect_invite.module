@@ -169,24 +169,18 @@ FBML;
  * Get facebook friend who has_added_app.
  */
 function fbconnect_get_connected_friends($fbuid) {
-  $fbid=array();
-  $rows=array();
+  $fbid = array();
+  $rows = array();
   if (facebook_client()) {
-    $query = "SELECT uid, has_added_app FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = $fbuid)";
     try {
       try {
-        $rows = facebook_client()->api(array(
-         'method' => 'fql.query',
-         'query'  => $query,
-        ));
-      }
-      catch (FacebookApiException $e) {
+        $rows = fbconnect_graph_query('/me/friends', array('fields' => 'id,installed'))->asArray();
+      } catch (Exception $e) {
         drupal_set_message($e->getMessage(), 'error');
         throw $e;
       }
-    }
-    catch (Exception $e) {
-      $msg  = 'Exception thrown while using fbconnect_get_connected_friends: @code';
+    } catch (Exception $e) {
+      $msg = 'Exception thrown while using fbconnect_get_connected_friends: @code';
       $args = array('@code' => $e->getMessage());
       watchdog('fbconnect', $msg, $args, WATCHDOG_ERROR);
     }
@@ -199,7 +193,7 @@ function fbconnect_get_connected_friends($fbuid) {
       }
 
       if ($fbid) {
-        $friends=array();
+        $friends = array();
         $res = db_select('fbconnect_users', 'f')
           ->fields('f', array('uid'))
           ->condition('f.fbuid', $fbid, 'IN')
