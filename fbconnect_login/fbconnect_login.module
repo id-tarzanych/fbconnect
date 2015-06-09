@@ -135,8 +135,11 @@ function fbconnect_login_user_logout() {
 function fbconnect_login_comment_view($comment) {
   if (theme_get_setting('toggle_comment_user_picture')) {
     // If this is a comment preview, we need to manually add $comment->picture.
-    if (!empty($comment->uid) && !isset($comment->picture)) {
-      $comment->picture = db_query("SELECT picture FROM {users} WHERE uid = :uid", array(':uid' => $comment->uid))->fetchField();
+    if (!empty($comment->uid)) {
+      $query = db_select('users', 'u');
+      $query->fields('u', array('picture'));
+      $query->condition('uid', $comment->uid);
+      $comment->picture = $query->execute()->fetchField();
     }
     if ($preset = variable_get('fbconnect_pic_size_comments', '')) {
       $comment->fbconnect_picture_preset = $preset;

@@ -217,8 +217,11 @@ function facebook_login_page(&$form, $form_state = array()) {
  * Returns a name suggestion if the wanted username is already used.
  */
 function _fbconnect_get_username($name_suggestion) {
-  $query = "SELECT COUNT(name) FROM {users} WHERE name = :user_name";
-  $result = db_query($query, array(':user_name' => $name_suggestion))->fetchField();
+  $query = db_select('users', 'u');
+  $query->condition('name', $name_suggestion);
+  $query->fields('u', array('name'));
+  $query->countQuery();
+  $result = $query->execute()->fetchField();
   if ($result) {
     $counter = variable_get('fbconnect_namecounter', 1);
     $newname = 'fbuser' . $counter;
