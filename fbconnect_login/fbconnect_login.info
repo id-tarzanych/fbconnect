@@ -1,0 +1,4 @@
+name = FBConnect Facebook Login
+dependencies[] = fbconnect
+package = "Facebook Social"
+core = 7.x

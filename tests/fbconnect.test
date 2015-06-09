@@ -64,7 +64,7 @@ class FbconnectTestCase extends DrupalWebTestCase {
       return;
     }
 
-    parent::setUp('fbconnect', 'fbconnect_test');
+    parent::setUp('fbconnect', 'fbconnect_login', 'fbconnect_test');
 
     foreach ($this->settings as $key => $value) {
       variable_set($key, $value);
@@ -101,10 +101,10 @@ class FbconnectTestCase extends DrupalWebTestCase {
     $this->drupalPost('fbconnect-test/init-fb-session', $edit, 'Submit');
     $this->assertFieldByName('fbuid', $fb_user['id'], 'FB Session inited', 'FBConnect');
 
-    $this->assertTrue(fbconnect_register($account->uid, $fb_user['id']), 'fbconnect_register returned true', 'FBConnect');
+    $this->assertTrue(fbconnect_login_register($account->uid, $fb_user['id']), 'fbconnect_register returned true', 'FBConnect');
     $this->assertNotNull(_get_user_fbuid($account->uid), 'FB Account is connected', 'FBConnect');
 
-    $this->drupalHead('fbconnect/register/create');
+    $this->drupalHead('fbconnect/authorize');
     $this->assertLink('My account', 0, 'User is logged in', 'FBConnect');
   }
 
@@ -125,7 +125,7 @@ class FbconnectTestCase extends DrupalWebTestCase {
     );
     $this->drupalPost('user', $edit, 'Log in', array(
       'query' => array(
-        'destination' => 'fbconnect/register/create',
+        'destination' => 'fbconnect/authorize',
       ),
     ));
     $this->assertLink('My account', 0, 'User is logged in', 'FBConnect');
@@ -147,7 +147,7 @@ class FbconnectTestCase extends DrupalWebTestCase {
       'mail' => $this->randomName() . '@example.com',
     );
 
-    $this->drupalPost('fbconnect/register/create', $edit, 'Create new account');
+    $this->drupalPost('fbconnect/authorize', $edit, 'Create new account');
     $this->assertLink('My account', 0, 'User is logged in', 'FBConnect');
   }
 
@@ -163,7 +163,7 @@ class FbconnectTestCase extends DrupalWebTestCase {
     );
     $this->drupalPost('fbconnect-test/init-fb-session', $edit, 'Submit');
     $this->assertFieldByName('fbuid', $fb_user['id'], 'FB Session inited', 'FBConnect');
-    $this->drupalHead('fbconnect/register/create', array(
+    $this->drupalHead('fbconnect/authorize', array(
       'query' => array(
         'fb-destination' => '',
       ),

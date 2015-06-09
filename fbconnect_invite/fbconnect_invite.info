@@ -1,4 +1,5 @@
-name = Facebook Friends Invite
+name = FBConnect Facebook Friends Invite
 dependencies[] = fbconnect
+dependencies[] = fbconnect_login
 package = "Facebook Social"
 core = 7.x
