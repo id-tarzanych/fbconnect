@@ -254,7 +254,7 @@ function fbconnect_fbapp_settings($form, &$form_state) {
     drupal_goto('admin/config/people/fbconnect');
   }
   $fbuid = fbconnect_get_fbuid();
-  if (!fbconnect_get_fbuid()) {
+  if (empty($fbuid)) {
     $button_attr = array('text' => t('Connect with your Facebook account'));
     $form['fbconnect'] = array(
       '#prefix' => '<div>' . t('You are not connected to the Facebook account that this application is registered to') . '</div>',
@@ -293,9 +293,9 @@ function fbconnect_fbapp_settings($form, &$form_state) {
 
 function fbconnect_fbapp_settings_submit($form, &$form_state) {
   $properties = array(
-    'connect_url'   => $form_state['values']['fbconnect_connect_url'],
-    'base_domain'   => $form_state['values']['fbconnect_base_domaine'],
-    'uninstall_url' => $form_state['values']['fbconnect_uninstall_url'],
+    'website_url'   => $form_state['values']['fbconnect_connect_url'],
+    'app_domains'   => array($form_state['values']['fbconnect_base_domaine']),
+    'deauth_callback_url' => $form_state['values']['fbconnect_uninstall_url'],
   );
 
   if (!facebook_client()) {
@@ -308,15 +308,13 @@ function fbconnect_fbapp_settings_submit($form, &$form_state) {
   }
 
   try {
-    $res = facebook_client()->api(array(
-      'method' => 'admin.setAppProperties',
-      'properties' => array_filter($properties),
-    ));
+    $fb_appid = variable_get('fbconnect_appid', NULL);
+    $res = fbconnect_graph_query('/' . $fb_appid, $properties, 'POST', TRUE)->asArray();
   }
   catch (Exception $e) {
     drupal_set_message(t('Exception thrown while using admin_setAppProperties : @code', array('@code' => $e->getMessage())), 'error');
   }
-  if (!$res) {
+  if (empty($res['success'])) {
     drupal_set_message(t('Checking your Facebook session, you are not allowed to change this application settings'), 'error');
   }
   else {
