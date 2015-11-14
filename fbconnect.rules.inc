@@ -5,7 +5,6 @@
  * Rules integration for the fbconnect module.
  *
  * @addtogroup rules
- * @{
  */
 
 /**
@@ -45,7 +44,3 @@ function fbconnect_rules_event_info() {
     ),
   );
 }
-
-/**
- * @}
- */

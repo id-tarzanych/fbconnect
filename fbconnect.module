@@ -27,26 +27,28 @@ function fbconnect_menu() {
     'file' => 'fbconnect.admin.inc',
   );
 
-  $items['admin/config/people/fbconnect/apperance'] = array(
-    'title' => 'Appearance',
-    'type' => MENU_LOCAL_TASK,
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('fbconnect_appearance_settings'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'fbconnect.admin.inc',
-  );
-
-  $items['admin/config/people/fbconnect/fb-app'] = array(
-    'title' => 'App Settings',
-    'type' => MENU_LOCAL_TASK,
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('fbconnect_fbapp_settings'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'fbconnect.admin.inc',
-    'weight' => 3,
-  );
-
   return $items;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function fbconnect_libraries_info() {
+  // Returns an associative array, with information about external library
+  $libraries['facebook-php-sdk'] = array(
+    'name' => 'Facebook PHP SDK',
+    'vendor url' => 'https://github.com/facebook/facebook-php-sdk-v4',
+    'download url' => 'https://github.com/facebook/facebook-php-sdk-v4/archive/5.0.0.zip',
+    'version' => '5.0.0',
+    // supported library version, including relevant files
+    'files' => array(
+      'php' => array(
+        'src/Facebook/autoload.php',
+      ),
+    ),
+  );
+
+  return $libraries;
 }
 
 /**
@@ -54,10 +56,15 @@ function fbconnect_menu() {
  */
 function _facebook_client_load_include() {
   if (!class_exists('Facebook\Facebook')) {
-    $sdk_path = DRUPAL_ROOT . '/sites/all/libraries/facebook-php-sdk-v4/src/Facebook/autoload.php';
-    $library = array('loaded' => file_exists($sdk_path));
-    if ($library['loaded']) {
-      require_once $sdk_path;
+    if (function_exists('libraries_load')) {
+      $library = libraries_load('facebook-php-sdk');
+    }
+    else {
+      $sdk_path = DRUPAL_ROOT . '/sites/all/libraries/facebook-php-sdk/src/Facebook/autoload.php';
+      $library = array('loaded' => file_exists($sdk_path));
+      if ($library['loaded']) {
+        require_once $sdk_path;
+      }
     }
 
     if (!$library['loaded']) {
@@ -65,8 +72,7 @@ function _facebook_client_load_include() {
     }
   }
 
-  $exists = class_exists('Facebook\Facebook') && defined('Facebook\Facebook::VERSION');
-  return $exists;
+  return class_exists('Facebook\Facebook') && defined('Facebook\Facebook::VERSION');
 }
 
 /**
@@ -74,19 +80,18 @@ function _facebook_client_load_include() {
  * @return Facebook
  *   Facebook Api object
  */
-function facebook_client() {
+function fbconnect_client() {
   static $fb = NULL;
+
   drupal_session_initialize();
 
   if (is_null($fb)) {
-
     $conf = fbconnect_get_config();
-
     if ($conf && _facebook_client_load_include()) {
       $initParams = array(
         'app_id' => $conf['app_id'],
         'app_secret' => $conf['secret_api_key'],
-        'default_graph_version' => 'v2.3',
+        'default_graph_version' => 'v2.4',
       );
 
       $fb = new Facebook($initParams);
@@ -99,63 +104,42 @@ function facebook_client() {
 /**
  * Get the Facebook access token object for easy access.
  */
-function facebook_get_access_token() {
+function fbconnect_access_token() {
   static $token = NULL;
 
-  $facebook = facebook_client();
+  $fb = facebook_client();
   $facebook_config = fbconnect_get_config();
 
-  if (!empty($_SESSION['fbconnect_token'])) {
-    $token = new AccessToken($_SESSION['fbconnect_token']);
+  if (!empty($_SESSION['SESSfbconnect'])) {
+    $token = new AccessToken($_SESSION['SESSfbconnect']);
   }
-  elseif (!empty($_COOKIE['fbconnect_token_' . $facebook_config['app_id']])) {
-    $_SESSION['fbconnect_token'] = $_COOKIE['fbconnect_token_' . $facebook_config['app_id']];
-    $token = new AccessToken($_SESSION['fbconnect_token']);
-  }
-  elseif (is_null($token) && $facebook) {
-    $helper = $facebook->getJavaScriptHelper();
+  else {
     try {
+      $helper = $fb->getJavaScriptHelper();
       $token = $helper->getAccessToken();
     }
     catch (Exception $e) {
       $token = NULL;
+      setcookie('SESSfbconnect' . $facebook_config['app_id'], '');
     }
   }
 
   if (!empty($token)) {
     try {
-      $request = $facebook->request('GET', '/me', array(), $token);
-      $response = $facebook->getClient()->sendRequest($request);
-      $_SESSION['fbconnect_token'] = $token->getValue();
-    } catch (Exception $e) {
-      $token = NULL;
-      unset($_SESSION['fbconnect_token']);
-      unset($_COOKIE['fbconnect_token_' . $facebook_config['app_id']]);
-      setcookie('fbconnect_token_' . $facebook_config['app_id'], '');
-
+      $request = $fb->get('/me', $token);
+      $_SESSION['fbconnect'] = $token->getValue();
+      setcookie('SESSfbconnect' . $facebook_config['app_id'], $token->getValue());
     }
+    catch (Exception $e) {
+      $token = NULL;
+      setcookie('SESSfbconnect' . $facebook_config['app_id'], '');
+    }
+  }
+  else {
+    setcookie('SESSfbconnect' . $facebook_config['app_id'], '');
   }
 
   return $token;
-}
-
-/**
- * Get the user profile or return null if they are not logged in and registered.
- * @return user_profile array
- */
-function fbconnect_user_profile() {
-  $user_profile = NULL;
-
-  if (($client = facebook_client()) && ($request = $client->request('GET', '/me', array(), facebook_get_access_token()))) {
-    try {
-      // Proceed knowing you have a logged in user who's authenticated.
-      $response = $client->getClient()->sendRequest($request);
-      $user_profile = $response->getGraphUser()->asArray();
-    } catch (Exception $e) {
-      $user_profile = NULL;
-    }
-  }
-  return $user_profile;
 }
 
 /**
@@ -163,106 +147,15 @@ function fbconnect_user_profile() {
  * @return array
  */
 function fbconnect_get_config() {
-  global $base_url;
-  static $config;
+  static $config = array();
 
   if (!$config) {
-    if (module_exists('i18n')) {
-      global $language;
-      $switch_code = variable_get('fbconnect_language_code_' . $language->language, '');
-
-      if ($switch_code) {
-        $config['language_code'] = $switch_code;
-      }
-    }
-
-    $config['user_pictures'] = variable_get('fbconnect_pic_allow', 'allow');
-    $config['language_code'] = variable_get('fbconnect_language_code', 'en_US');
     $config['app_id'] = variable_get('fbconnect_appid', NULL);
     $config['secret_api_key'] = variable_get('fbconnect_skey', NULL);
-    $config['debug'] = variable_get('fbconnect_debug', FALSE);
-    if (variable_get('fbconnect_ssl', FALSE)) {
-      $config['connect_js'] = "'https://connect.facebook.net/$config[language_code]/sdk.js'";
-    }
-    else {
-      $config['connect_js'] = "document.location.protocol + '//connect.facebook.net/$config[language_code]/sdk.js'";
-    }
-
-    $config['loginout_mode'] = variable_get('fbconnect_loginout_mode', 'manual');
-    $config['invite_name'] = variable_get('fbconnect_invite_name', variable_get('site_name', $base_url));
-    $config['fast_reg_mode'] = variable_get('fbconnect_fast_reg', NULL);
-    $config['fast_reg_autoname'] = variable_get('fbconnect_fast_reg_autoname', 1);
-    // Allow third party modules to change settings.
     drupal_alter('fbconnect_config', $config);
   }
 
-  if ($config['app_id'] && $config['secret_api_key']) {
-    return $config;
-  }
-}
-
-/**
- * Check Facebook session.
- *
- * @param boolean $check_connected
- *   ensure that active user is connected with active Facebook account
- *
- * @return integer
- *   Facebook user id
- */
-function fbconnect_get_fbuid($check_connected = FALSE) {
-  global $user;
-
-  $fbuid = 0;
-  $fb = facebook_client();
-
-  if ($fb && ($request = $fb->request('GET', '/me', array(), facebook_get_access_token()))) {
-    try {
-      $client = $fb->getClient();
-      $response = $client->sendRequest($request);
-      $fbuid = $response->getGraphUser()->getId();
-
-      if (module_exists('fbconnect_login') && $check_connected && $fbuid) {
-        if (_get_user_fbuid($user->uid) != $fbuid) {
-          $fbuid = NULL;
-        }
-      }
-    }
-    catch (Exception $e) {
-
-      $fbuid = 0;
-    }
-
-  }
-
-  return $fbuid;
-}
-
-/**
- * This function manage all javascripts used by this module.
- */
-function fbconnect_render_js() {
-  global $base_url;
-  global $user;
-
-  $module_path = drupal_get_path('module', 'fbconnect');
-
-  if ($config = fbconnect_get_config()) {
-    unset($config['secret_api_key']);
-    $config['fbuid'] = fbconnect_get_fbuid();
-    $config['user'] = array(
-      'uid' => $user->uid,
-    );
-
-    if (module_exists('fbconnect_login')) {
-      $user->fbuid = _get_user_fbuid($user->uid);
-      $config['fbuid'] = @$user->fbuid;
-    }
-
-    drupal_add_js(array('fbconnect' => $config), array('type' => 'setting', 'scope' => JS_DEFAULT));
-    drupal_add_js($module_path . '/fbconnect.js');
-    drupal_add_css($module_path . '/fbconnect.css');
-  }
+  return $config;
 }
 
 /**
@@ -271,125 +164,19 @@ function fbconnect_render_js() {
 function fbconnect_page_alter(&$page) {
   if (facebook_client() && !_fbconnect_is_excluded_page($_GET['q']) && !variable_get('fbconnect_noroot')) {
     $config = fbconnect_get_config();
-	$invite_msg = check_plain(variable_get('fbconnect_invite_msg', t('Enjoy!')));
-    $channel_uri = preg_replace("@'@msi", "\'", "http://" . $_SERVER['HTTP_HOST'] . "/" . drupal_get_path('module', 'fbconnect') . "/channel.html");
-    $invite_code = (arg(0) == "fbconnect" && arg(1) == "invite" && arg(2) == "friends") ? 'FB.ui({method: "apprequests", message: "'.$invite_msg.'"}, function() {});' : "";
-    $page['page_bottom']['fb-init-code'] = array(
-      '#type' => 'markup',
-      '#markup' => '<div id="fb-root"></div>
-      <script type="text/javascript">
-        window.fbAsyncInit = function() {
-          FB.init({
-            appId : \'' . $config['app_id'] . '\',
-            cookie : true, // enable cookies to allow the server to access the session
-            xfbml : true,
-            logging: \'' . $config['debug'] . '\',
-            channelURL: \'' . $channel_uri . '\',
-            oauth  : true,
-            frictionlessRequests: true,
-            status     : true,
-            version    : \'v2.3\'
-          });
-          // whenever the user logs in, we tell our login service
-          FB.Event.subscribe(\'auth.login\', function() {
-            var token = FB.getAccessToken();
-            if (token) {
-              document.cookie = \'fbconnect_token_' . $config['app_id'] .'=\' + token;
-            }
-            else {
-              window.location.reload(true);
-            }
-          });
-          FB.Event.subscribe(\'auth.authResponseChange\', function(response) {
-            if (response.status === \'connected\') {
-              var token = FB.getAccessToken();
-              if (token) {
-                document.cookie = \'fbconnect_token_' . $config['app_id'] .'=\' + token;
-              }
-            }
-          });
-          FB.Event.subscribe(\'auth.logout\', function(response) {
-            document.cookie = \'fbconnect_token_' . $config['app_id'] . '=\';
-            window.location.reload(true);
-          });
 
-                    ' . $invite_code . '
-          jQuery(document).trigger(\'fb:init\');
-        };
-        (function() {
-          var e = document.createElement(\'script\');
-          e.src = ' . $config['connect_js'] . ';
-          e.async = true;
-          document.getElementById(\'fb-root\').appendChild(e);
-        }());
-      </script>'
-    );
+    drupal_add_js(array(
+      'fbconnect' => array(
+        'appId' => $config['app_id'],
+      )),
+      'setting');
+    drupal_add_js(drupal_get_path('module', 'fbconnect') . '/fbconnect.js');
   }
 }
 
 /**
- * Make Graph Query.
- *
- * @param string $path
- * @return array
+ * Helper: Check exclude pages
  */
-function fbconnect_graph_query($path, $params = array(), $method = 'GET', $use_app_token = FALSE) {
-  if (($client = facebook_client()) && $path) {
-    try {
-      try {
-        $token = $use_app_token ? $client->getApp()->getAccessToken() : facebook_get_access_token();
-        $request = $client->request($method, $path, $params, $token);
-        $response = $client->getClient()->sendRequest($request);
-        return $response->getGraphObject();
-      }
-      catch (Exception $e) {
-        drupal_set_message($e->getMessage(), 'error');
-        throw $e;
-      }
-    }
-    catch (Exception $e) {
-      $msg = 'Exception thrown while using fbconnect_graph_query : @code';
-      watchdog('fbconnect', $msg, array('@code' => $e->getMessage()), WATCHDOG_WARNING);
-    }
-  }
-}
-
-/**
- * Check the users table to see if the email is already in the drupal system
- *  returns uid of user with the email.
- */
-function _email_already_exist($email) {
-  $query = db_select('users', 'u');
-  $query->fields('u', array('uid'));
-  $query->condition('mail', $email, '=');
-  $query->countQuery();
-  return $query->execute()->fetchField();
-}
-
-/**
- * Query information from Facebook user table.
- *
- * @return array
- */
-function fbconnect_get_user_info($fields = array(), $fbuid = NULL) {
-  $params = array();
-
-  if (!$fbuid) {
-    $fbuid = fbconnect_get_fbuid();
-  }
-
-  if (is_array($fields) && count($fields)) {
-    $params['fields'] = join(', ', $fields);
-  }
-  elseif ($fields) {
-    $params['fields'] = $fields;
-  }
-
-  if ($fbuid) {
-    return fbconnect_graph_query("/" . $fbuid, $params)->asArray();
-  }
-}
-
 function _fbconnect_is_excluded_page($path) {
   return drupal_match_path($path, variable_get('fbconnect_exclude_patterns', ''));
 }

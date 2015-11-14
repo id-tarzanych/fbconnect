@@ -2,6 +2,4 @@ name = FBConnect
 description = Allows users to connect with Facebook account
 package = "Facebook Social"
 core = 7.x
-files[] = tests/fbconnect.test
-configure =  admin/config/people/fbconnect
-
+configure = admin/config/people/fbconnect

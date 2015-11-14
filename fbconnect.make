@@ -30,6 +30,6 @@ projects[libraries][subdir] = contrib
 ; ------------
 
 libraries[facebook-php-sdk-v4][download][type] = "get"
-libraries[facebook-php-sdk-v4][download][url] = "https://github.com/facebook/facebook-php-sdk-v4/archive/4.1-dev.zip"
+libraries[facebook-php-sdk-v4][download][url] = "https://github.com/facebook/facebook-php-sdk-v4/archive/5.0.0.zip"
 libraries[facebook-php-sdk-v4][destination] = "libraries"
 
